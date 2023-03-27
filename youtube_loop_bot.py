@@ -5,7 +5,7 @@ import schedule
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
-from tools.googleytapi import GoogleYTAPI
+from tools.googleytapi import GoogleYTAPI, CHANNELS_ID_YT
 import time
 import asyncio
 
@@ -15,20 +15,6 @@ client = discord.Client()
 
 TOKEN = os.getenv("DISCORD_TOKEN")
 CHANNEL_ID = int(os.getenv("YOUTUBE_CHANNEL"))
-
-CHANNELS_ID_YT = {
-    "Marvel Brasil": "UCItRs-h8YU1wRRfP637614w",
-    "Marvel Entertainment": "UCvC4D8onUfXzvjTOM-dBfEA",
-    "Netflix Brasil": "UCc1l5mTmAv2GC_PXrBpqyKQ",
-    "20th Century Studios Brasil": "UCTFbGAgp5L6IgUTQDW93zlQ",
-    "Paramount Brasil": "UCgqD3GdUEfupsdY1kmFLIrw",
-    "Prime Video Brasil": "UCuNjvqjTzw9LcD9PVpTVWRA",
-    "Apple TV ": "UC1Myj674wRVXB9I4c6Hm5zA",
-    "Warner Channel Brasil": "UC8msOgi2CPRQKqwSK-nKwtA",
-    "Warner Bros. Pictures Brasil": "UCEOVI4AmQE01FDKNFunkV2w",
-    "TrailersBR": "UCF0SVZVMvkPIFGk3gu_GuNg",
-    "HBO Brasil": "UCX2M7xn-jMmq4KfX25TCTCA",
-}
 
 
 async def last_videos():
