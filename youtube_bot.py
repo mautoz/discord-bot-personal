@@ -37,7 +37,7 @@ async def getid(ctx, arg):
     """
     Fill
     """
-    channel = str(arg).strip().lower()
+    channel = str(arg).strip()
 
     if str(arg).strip():
         await ctx.send(f"Channel ID:\t{CHANNELS_ID_YT[channel]}")
