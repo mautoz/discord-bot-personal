@@ -1,13 +1,14 @@
 #!/usr/bin/env python3
 
 import os
+import time
+import asyncio
 import schedule
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 from tools.googleytapi import GoogleYTAPI, CHANNELS_ID_YT
-import time
-import asyncio
+
 
 load_dotenv()
 
@@ -66,7 +67,8 @@ async def send_message():
 
 
 async def schedule_message():
-    schedule.every().day.at("12:00").do(asyncio.ensure_future, last_videos())
+    schedule.every().day.at("13:05").do(asyncio.ensure_future, last_videos())
+    schedule.every().day.at("21:00").do(asyncio.ensure_future, last_videos())
 
 
 client.loop.create_task(schedule_message())
