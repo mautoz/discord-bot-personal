@@ -5,6 +5,7 @@ from discord.ext import commands
 from dotenv import load_dotenv
 import asyncio
 import datetime
+import pytz
 
 load_dotenv()
 
@@ -65,7 +66,7 @@ async def update_status():
         )
         status_embed.set_field_at(i, name=name, value=status, inline=False)
 
-    last_update = datetime.datetime.now()
+    last_update = datetime.datetime.now(pytz.timezone("America/Sao_Paulo"))
     status_embed.set_field_at(
         i + 1, name="Last update", value=str(last_update), inline=False
     )
