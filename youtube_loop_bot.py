@@ -70,7 +70,7 @@ async def send_message():
 
 
 async def schedule_message():
-    schedule.every().day.at("13:05").do(asyncio.ensure_future, last_videos())
+    schedule.every().day.at("14:05").do(asyncio.ensure_future, last_videos())
     schedule.every().day.at("00:00").do(asyncio.ensure_future, last_videos())
 
 

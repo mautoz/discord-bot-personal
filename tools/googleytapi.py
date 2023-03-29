@@ -75,7 +75,7 @@ class GoogleYTAPI:
                 order="date",
                 channelId=channel_id.strip(),
                 publishedAfter=(
-                    datetime.datetime.now() - datetime.timedelta(days=15)
+                    datetime.datetime.now() - datetime.timedelta(days=1)
                 ).strftime("%Y-%m-%dT%H:%M:%SZ"),
             )
             .execute()
@@ -140,3 +140,70 @@ class GoogleYTAPI:
 #             )
 #             title = video.get("snippet", None).get("title", None)
 #             print(f"{channel}\t{title}\t{publish_time}\t{thumbnails}")
+
+
+# Response Example
+
+# [{'etag': 'oZJg1f7pFxhGjvEEN1xhgK6mrUI',
+#   'id': {'kind': 'youtube#video', 'videoId': 'V51j_FKGdfU'},
+#   'kind': 'youtube#searchResult',
+#   'snippet': {'channelId': 'UCItRs-h8YU1wRRfP637614w',
+#               'channelTitle': 'Marvel Brasil',
+#               'description': 'Da produtora executiva Zoë Saldaña, #PoderM é '
+#                              'uma Série Original em 4 episódios. Assista agora '
+#                              'no #DisneyPlus.',
+#               'liveBroadcastContent': 'none',
+#               'publishTime': '2023-03-17T17:58:52Z',
+#               'publishedAt': '2023-03-17T17:58:52Z',
+#               'thumbnails': {'default': {'height': 90,
+#                                          'url': 'https://i.ytimg.com/vi/V51j_FKGdfU/default.jpg',
+#                                          'width': 120},
+#                              'high': {'height': 360,
+#                                       'url': 'https://i.ytimg.com/vi/V51j_FKGdfU/hqdefault.jpg',
+#                                       'width': 480},
+#                              'medium': {'height': 180,
+#                                         'url': 'https://i.ytimg.com/vi/V51j_FKGdfU/mqdefault.jpg',
+#                                         'width': 320}},
+#               'title': 'Poder M | Trailer Oficial | Disney+'}},
+#  {'etag': '81cqGB8pJHVRh7XZxHBfwUhvkWU',
+#   'id': {'kind': 'youtube#video', 'videoId': '5BmQkV06o-I'},
+#   'kind': 'youtube#searchResult',
+#   'snippet': {'channelId': 'UCItRs-h8YU1wRRfP637614w',
+#               'channelTitle': 'Marvel Brasil',
+#               'description': 'HomemFormigaEAVespa: Quantumania, hoje nos '
+#                              'cinemas e em 3D.',
+#               'liveBroadcastContent': 'none',
+#               'publishTime': '2023-03-15T21:00:02Z',
+#               'publishedAt': '2023-03-15T21:00:02Z',
+#               'thumbnails': {'default': {'height': 90,
+#                                          'url': 'https://i.ytimg.com/vi/5BmQkV06o-I/default.jpg',
+#                                          'width': 120},
+#                              'high': {'height': 360,
+#                                       'url': 'https://i.ytimg.com/vi/5BmQkV06o-I/hqdefault.jpg',
+#                                       'width': 480},
+#                              'medium': {'height': 180,
+#                                         'url': 'https://i.ytimg.com/vi/5BmQkV06o-I/mqdefault.jpg',
+#                                         'width': 320}},
+#               'title': 'Homem o quê? 🤔🐜⁉ #Shorts'}},
+#  {'etag': 'so1if_Ju1awbLBf0ZtaNhc4ndAM',
+#   'id': {'kind': 'youtube#video', 'videoId': 'kYMNAiQDRq0'},
+#   'kind': 'youtube#searchResult',
+#   'snippet': {'channelId': 'UCItRs-h8YU1wRRfP637614w',
+#               'channelTitle': 'Marvel Brasil',
+#               'description': 'A maneira como esta trilha foi feita... dá um '
+#                              'filme! #VozesEmAscensão: a música de Wakanda '
+#                              'Para Sempre. Em 29 de março ...',
+#               'liveBroadcastContent': 'none',
+#               'publishTime': '2023-03-14T17:11:25Z',
+#               'publishedAt': '2023-03-14T17:11:25Z',
+#               'thumbnails': {'default': {'height': 90,
+#                                          'url': 'https://i.ytimg.com/vi/kYMNAiQDRq0/default.jpg',
+#                                          'width': 120},
+#                              'high': {'height': 360,
+#                                       'url': 'https://i.ytimg.com/vi/kYMNAiQDRq0/hqdefault.jpg',
+#                                       'width': 480},
+#                              'medium': {'height': 180,
+#                                         'url': 'https://i.ytimg.com/vi/kYMNAiQDRq0/mqdefault.jpg',
+#                                         'width': 320}},
+#               'title': 'Vozes em Ascensão: A Música de Wakanda Para Sempre | '
+#                        'Disney+'}}
