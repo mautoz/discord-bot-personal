@@ -31,6 +31,9 @@ async def last_videos():
         videos = googleytapi.search_last_videos(str(yt_id))
         if videos:
             for video in videos:
+                video_id = str(
+                    video.get("id", None).get("videoId", None)
+                ).strip()
                 channel_name = str(
                     video.get("snippet", None).get("channelTitle", None)
                 ).strip()
@@ -50,7 +53,7 @@ async def last_videos():
                     f"Canal: {channel_name}\n \
                     Título: {title}\n \
                     Data de publicação: {publish_time}\n \
-                    {thumbnails}"
+                    Link: https://www.youtube.com/watch?v={video_id}"
                 )
 
         else:

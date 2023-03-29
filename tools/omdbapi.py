@@ -85,11 +85,11 @@ class OMDBAPI:
         response = self._retrive_url(url)
 
         return f"""
-            {response.get('Title', None)} ({response.get('Year', None)})\n
-            {response.get('Director', None)}\n
-            {response.get('Actors', None)}\n
-            {response.get('Genre', None)}\n
-            {response.get('Plot', None)}\n
+            Título: {response.get('Title', None)} ({response.get('Year', None)})\n
+            Diretor: {response.get('Director', None)}\n
+            Elenco (parcial): {response.get('Actors', None)}\n
+            Gênero: {response.get('Genre', None)}\n
+            Plot: {response.get('Plot', None)}\n
             {response.get('Poster', None)}\n
         """
 

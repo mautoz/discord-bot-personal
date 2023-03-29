@@ -75,7 +75,7 @@ class GoogleYTAPI:
                 order="date",
                 channelId=channel_id.strip(),
                 publishedAfter=(
-                    datetime.datetime.now() - datetime.timedelta(days=1)
+                    datetime.datetime.now() - datetime.timedelta(days=15)
                 ).strftime("%Y-%m-%dT%H:%M:%SZ"),
             )
             .execute()
@@ -89,54 +89,54 @@ class GoogleYTAPI:
         return None
 
 
-if __name__ == "__main__":
-    googleytapi = GoogleYTAPI()
-    channels = [
-        "Marvel Brasil",
-        "Marvel Entertainment",
-        "Netflix Brasil",
-        "20th Century Studios Brasil",
-        "Paramount Brasil",
-        "Prime Video Brasil",
-        "Apple TV ",
-        "Warner Channel Brasil",
-        "Warner Bros. Pictures Brasil",
-        "TrailersBR",
-        "HBO Brasil",
-    ]
+# if __name__ == "__main__":
+#     googleytapi = GoogleYTAPI()
+# channels = [
+#     "Marvel Brasil",
+#     "Marvel Entertainment",
+#     "Netflix Brasil",
+#     "20th Century Studios Brasil",
+#     "Paramount Brasil",
+#     "Prime Video Brasil",
+#     "Apple TV ",
+#     "Warner Channel Brasil",
+#     "Warner Bros. Pictures Brasil",
+#     "TrailersBR",
+#     "HBO Brasil",
+# ]
 
-    dict_channels = {}
-    for channel in channels:
-        dict_channels[channel] = googleytapi.search_channel_id(channel)
+# dict_channels = {}
+# for channel in channels:
+#     dict_channels[channel] = googleytapi.search_channel_id(channel)
 
-    print(dict_channels)
+# print(dict_channels)
 
-    # channels_id = {
-    #     "Marvel Brasil": "UCItRs-h8YU1wRRfP637614w",
-    #     "Marvel Entertainment": "UCvC4D8onUfXzvjTOM-dBfEA",
-    #     "Netflix Brasil": "UCc1l5mTmAv2GC_PXrBpqyKQ",
-    # }
+# channels_id = {
+#     "Marvel Brasil": "UCItRs-h8YU1wRRfP637614w",
+#     "Marvel Entertainment": "UCvC4D8onUfXzvjTOM-dBfEA",
+#     "Netflix Brasil": "UCc1l5mTmAv2GC_PXrBpqyKQ",
+# }
 
-    # for channel, yt_id in channels_id.items():
-    #     print(f"Current: {channel}")
-    #     response = googleytapi.search_last_videos(yt_id)
+# for channel, yt_id in channels_id.items():
+#     print(f"Current: {channel}")
+#     response = googleytapi.search_last_videos(yt_id)
 
-    #     import pprint as pp
+#     import pprint as pp
 
-    #     pp.pprint(response)
+#     pp.pprint(response)
 
-    #     videos = response.get("items", None)
+#     videos = response.get("items", None)
 
-    #     if videos:
-    #         for video in videos:
-    #             channel = video.get("snippet", None).get("channelTitle", None)
-    #             publish_time = video.get("snippet", None).get(
-    #                 "publishTime", None
-    #             )
-    #             thumbnails = (
-    #                 video.get("snippet", None)
-    #                 .get("thumbnails", None)
-    #                 .get("default", None)
-    #             )
-    #             title = video.get("snippet", None).get("title", None)
-    #             print(f"{channel}\t{title}\t{publish_time}\t{thumbnails}")
+#     if videos:
+#         for video in videos:
+#             channel = video.get("snippet", None).get("channelTitle", None)
+#             publish_time = video.get("snippet", None).get(
+#                 "publishTime", None
+#             )
+#             thumbnails = (
+#                 video.get("snippet", None)
+#                 .get("thumbnails", None)
+#                 .get("default", None)
+#             )
+#             title = video.get("snippet", None).get("title", None)
+#             print(f"{channel}\t{title}\t{publish_time}\t{thumbnails}")
