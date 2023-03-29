@@ -82,6 +82,28 @@ async def last(ctx, arg):
         await ctx.send("Comando exclusivo do #Youtube.")
 
 
+@bot.command()
+async def searchchannel(ctx, arg):
+    """
+    Fill
+    """
+    if ctx.channel.id == CHANNEL_ID:
+        googleytapi = GoogleYTAPI()
+        id_channel = googleytapi.search_channel_id(str(arg))
+        if id_channel:
+            await ctx.send(f"O id do canal {str(arg)} é {id_channel}")
+
+        else:
+            await ctx.send(
+                "Não encontramos o canal no Youtube! Copie diretamente do Youtube o nome e utilize aspas se necessário!"
+            )
+
+        del googleytapi
+
+    else:
+        await ctx.send("Comando exclusivo do #Youtube.")
+
+
 # @bot.command()
 # async def id(ctx, arg):
 #     """

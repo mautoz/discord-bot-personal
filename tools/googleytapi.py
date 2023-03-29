@@ -24,6 +24,9 @@ CHANNELS_ID_YT = {
     "Warner Bros. Pictures Brasil": "UCEOVI4AmQE01FDKNFunkV2w",
     "TrailersBR": "UCF0SVZVMvkPIFGk3gu_GuNg",
     "HBO Brasil": "UCX2M7xn-jMmq4KfX25TCTCA",
+    "Walt Disney Studios BR": "UCP6nJ-Elnfnpjv6HQRsv1Cw",
+    "Universal Pictures Brasil": "UCwhVCdYsd-A32RECPqJUoPg",
+    "Sony Pictures Brasil": "UC9NXpIA01HVRhYgcEbs80Nw",
 }
 
 
