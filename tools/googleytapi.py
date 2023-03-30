@@ -43,6 +43,12 @@ class GoogleYTAPI:
             developerKey=os.getenv("DEVELOPER_KEY"),
         )
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        pass
+
     def search_channel_id(self, channel_name: str) -> Union[str, None]:
         """
         Fill
@@ -78,6 +84,7 @@ class GoogleYTAPI:
                 publishedAfter=(
                     datetime.datetime.now() - datetime.timedelta(days=1)
                 ).strftime("%Y-%m-%dT%H:%M:%SZ"),
+                type="video",
             )
             .execute()
         )

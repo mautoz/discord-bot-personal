@@ -23,13 +23,19 @@ async def getid(ctx, arg):
     """
     Fill
     """
-    channel = str(arg).strip()
+    if ctx.channel.id == CHANNEL_ID:
+        channel = str(arg).strip()
 
-    if str(arg).strip():
-        await ctx.send(f"Channel ID:\t{CHANNELS_ID_YT[channel]}")
-        return
+        if str(arg).strip():
+            await ctx.send(f"Channel ID:\t{CHANNELS_ID_YT[channel]}")
+            return
 
-    await ctx.send("Verifique se você digitou corretamente o nome do canal!")
+        await ctx.send(
+            "Verifique se você digitou corretamente o nome do canal!"
+        )
+
+    else:
+        await ctx.send("Comando exclusivo do #Youtube.")
 
 
 @bot.command()
@@ -37,13 +43,17 @@ async def channels(ctx):
     """
     Fill
     """
-    buffer = []
-    for channel, _ in CHANNELS_ID_YT.items():
-        buffer.append(channel)
+    if ctx.channel.id == CHANNEL_ID:
+        buffer = []
+        for channel, _ in CHANNELS_ID_YT.items():
+            buffer.append(channel)
 
-    result = "\n".join(buffer)
+        result = "\n".join(buffer)
 
-    await ctx.send(result)
+        await ctx.send(result)
+
+    else:
+        await ctx.send("Comando exclusivo do #Youtube.")
 
 
 @bot.command()
