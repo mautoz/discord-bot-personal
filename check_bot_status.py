@@ -9,10 +9,13 @@ import pytz
 
 load_dotenv()
 
-TOKEN = os.getenv("DISCORD_TOKEN")
+TOKEN = os.getenv("DISCORD_TOKEN_HAL")
 SERVER_CHANNEL = int(os.getenv("SERVER_CHANNEL"))
+SERVER_CHANNEL_HAL = int(os.getenv("SERVER_CHANNEL_HAL"))
 MSG_DEFAULT = int(os.getenv("SERVER_DEFAULT_MSG"))
 MSG_DEFAULT_TD = int(os.getenv("SERVER_DEFAULT_MSG_TD"))
+MSG_DEFAULT_HAL = int(os.getenv("SERVER_DEFAULT_MSG_HAL"))
+MSG_DEFAULT_HAL_TD = int(os.getenv("SERVER_DEFAULT_MSG_HAL_TD"))
 
 BOTS = {
     "IMDB": "imdb_bot.py",
@@ -93,14 +96,23 @@ async def update_status():
         i + 1, name="Last update", value=str(last_update), inline=False
     )
 
+    # Skynet Server
     channel = client.get_channel(SERVER_CHANNEL)
-
     # Check if the embed already exists!
     status_message = await channel.fetch_message(MSG_DEFAULT)
     if status_message:
         await status_message.edit(embed=status_embed)
     else:
         await channel.send(embed=status_embed)
+
+    # Tropa Dercy Server
+    channel_skynet = client.get_channel(SERVER_CHANNEL_HAL)
+    # Check if the embed already exists!
+    status_message = await channel_skynet.fetch_message(MSG_DEFAULT_HAL)
+    if status_message:
+        await status_message.edit(embed=status_embed)
+    else:
+        await channel_skynet.send(embed=status_embed)
 
 
 async def update_status_tropa():
@@ -123,10 +135,19 @@ async def update_status_tropa():
         i + 1, name="Last update", value=str(last_update), inline=False
     )
 
+    # Skynet Server
     channel = client.get_channel(SERVER_CHANNEL)
-
     # Check if the embed already exists!
     status_message = await channel.fetch_message(MSG_DEFAULT_TD)
+    if status_message:
+        await status_message.edit(embed=status_embed_td)
+    else:
+        await channel.send(embed=status_embed_td)
+
+    # Tropa Dercy Server
+    channel = client.get_channel(SERVER_CHANNEL_HAL)
+    # Check if the embed already exists!
+    status_message = await channel.fetch_message(MSG_DEFAULT_HAL_TD)
     if status_message:
         await status_message.edit(embed=status_embed_td)
     else:
