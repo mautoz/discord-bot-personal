@@ -16,7 +16,7 @@ client = discord.Client()
 
 TOKEN = os.getenv("DISCORD_TOKEN")
 CHANNEL_ID = int(os.getenv("YOUTUBE_CHANNEL"))
-MAX_MESSAGE_LENGTH = 2000
+MAX_MESSAGE_LENGTH = 1800
 
 
 async def last_videos():
@@ -70,7 +70,7 @@ async def last_videos():
 
 
 async def schedule_message():
-    schedule.every().day.at("01:00").do(asyncio.ensure_future, last_videos())
+    schedule.every().day.at("22:57").do(asyncio.create_task, last_videos())
 
 
 client.loop.create_task(schedule_message())
