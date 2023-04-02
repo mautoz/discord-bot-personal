@@ -68,7 +68,7 @@ async def last_videos():
 
 
 async def schedule_message():
-    schedule.every().day.at("00:00").do(asyncio.create_task(last_videos()))
+    schedule.every().day.at("00:00").do(asyncio.create_task, last_videos())
 
 
 client.loop.create_task(schedule_message())
