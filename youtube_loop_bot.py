@@ -16,7 +16,7 @@ client = discord.Client()
 
 TOKEN = os.getenv("DISCORD_TOKEN")
 CHANNEL_ID = int(os.getenv("YOUTUBE_CHANNEL"))
-MAX_MESSAGE_LENGTH = 1800
+MAX_MESSAGE_LENGTH = 1500
 
 
 async def last_videos():
@@ -49,12 +49,10 @@ async def last_videos():
                         video.get("snippet", None).get("title", None)
                     ).strip()
 
-                    buffer = f"""
-                    Canal: **{channel_name}**\n \
-                    Título: {title}\n \
-                    Data de publicação: {publish_time}\n \
-                    Link: https://www.youtube.com/watch?v={video_id}\n
-                    \n
+                    buffer = f"""\u200bCanal: **{channel_name}**\n \
+                    \u200bTítulo: {title}\n \
+                    \u200bData de publicação: {publish_time}\n \
+                    \u200bLink: https://www.youtube.com/watch?v={video_id}\n
                     """
 
                     if len(message) + len(buffer) > MAX_MESSAGE_LENGTH:
@@ -64,13 +62,13 @@ async def last_videos():
                         message += buffer
 
             else:
-                message += f"Sem atualizações recentes para o canal: **{yt_channel}**\n"
+                message += f"\u200bSem atualizações recentes para o canal: **{yt_channel}**\n"
 
         await channel.send(message)
 
 
 async def schedule_message():
-    schedule.every().day.at("22:57").do(asyncio.create_task, last_videos())
+    schedule.every().day.at("00:00").do(asyncio.create_task(last_videos()))
 
 
 client.loop.create_task(schedule_message())
