@@ -67,18 +67,11 @@ async def last_videos():
         await channel.send(message)
 
 
-async def schedule_message():
-    schedule.every().day.at("00:00").do(asyncio.create_task, last_videos())
-
-
-client.loop.create_task(schedule_message())
-
-
-async def start_loop():
+@client.event
+async def on_ready():
     while True:
-        schedule.run_pending()
-        await asyncio.sleep(1)
+        await last_videos()
+        await asyncio.sleep(43200)
 
 
-client.loop.create_task(start_loop())
 client.run(TOKEN)
