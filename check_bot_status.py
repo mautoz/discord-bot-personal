@@ -24,6 +24,8 @@ BOTS = {
     "Welcome": "welcome_member.py",
     "Youtube_Search": "youtube_bot.py",
     "Youtube_News": "youtube_loop_bot.py",
+    "Tweet_Scraper": "tweet_bot.py",
+    "Games_deals": "games_deals_bot"
 }
 
 BOTS_TROPA = {
@@ -31,6 +33,8 @@ BOTS_TROPA = {
     "Welcome": "welcome_member_td.py",
     "Youtube_Search": "youtube_bot_td.py",
     "Youtube_News": "youtube_loop_bot_td.py",
+    "Tweet_Scraper": "tweet_bot.py",
+    "Games_deals": "games_deals_bot"
 }
 
 
@@ -62,6 +66,8 @@ status_embed.add_field(name="IMDB", value="Offline")
 status_embed.add_field(name="Welcome", value="Offline")
 status_embed.add_field(name="Youtube_Search", value="Offline")
 status_embed.add_field(name="Youtube_News", value="Offline")
+status_embed.add_field(name="Tweet_Scraper", value="Offline")
+status_embed.add_field(name="Games_deals", value="Offline")
 status_embed.add_field(name="Last update", value="Offline")
 
 # Tropa
@@ -75,6 +81,8 @@ status_embed_td.add_field(name="IMDB", value="Offline")
 status_embed_td.add_field(name="Welcome", value="Offline")
 status_embed_td.add_field(name="Youtube_Search", value="Offline")
 status_embed_td.add_field(name="Youtube_News", value="Offline")
+status_embed_td.add_field(name="Tweet_Scraper", value="Offline")
+status_embed_td.add_field(name="Games_deals", value="Offline")
 status_embed_td.add_field(name="Last update", value="Offline")
 
 # Telegram
