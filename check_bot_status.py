@@ -77,9 +77,9 @@ status_embed_td.set_thumbnail(
 status_embed_td.add_field(name="IMDB", value="Offline")
 status_embed_td.add_field(name="Welcome", value="Offline")
 status_embed_td.add_field(name="Youtube_Search", value="Offline")
-status_embed_td.add_field(name="Youtube_News", value="Offline")
-status_embed_td.add_field(name="Tweet_Scraper", value="Offline")
-status_embed_td.add_field(name="Games_deals", value="Offline")
+# status_embed_td.add_field(name="Youtube_News", value="Offline")
+# status_embed_td.add_field(name="Tweet_Scraper", value="Offline")
+# status_embed_td.add_field(name="Games_deals", value="Offline")
 status_embed_td.add_field(name="Last update", value="Offline")
 
 # Telegram
