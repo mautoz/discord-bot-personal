@@ -71,7 +71,7 @@ async def last_videos():
 async def on_ready():
     while True:
         await last_videos()
-        await asyncio.sleep(43200)
+        await asyncio.sleep(86400)
 
 
 client.run(TOKEN)
