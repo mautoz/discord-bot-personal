@@ -18,6 +18,7 @@ client = discord.Client()
 
 TOKEN = os.getenv("DISCORD_TOKEN_HAL")
 CHANNEL_ID_SKYNET = int(os.getenv("SKYNET_GAMES_CHANNEL"))
+CHANNEL_ID_TROPA = int(os.getenv("TROPA_GAMES_CHANNEL"))
 ITAD_API_KEY = os.getenv("ITAD_API_KEY")
 
 MAX_LENGTH = 1700
@@ -71,16 +72,19 @@ def insert_brackets(text: str) -> str:
 
 async def get_discount() -> list:
     channel = client.get_channel(CHANNEL_ID_SKYNET)
+    channel_tropa = client.get_channel(CHANNEL_ID_TROPA)
     stores = get_stores()
 
     deals = retrive_url(URL_DEALS_BR.format(os.getenv('ITAD_API_KEY'), "%2C".join(stores)))
     deals_list = deals.get('data').get('list')
     if deals_list is None:
       await channel.send("**Não tem descontos hoje!**")
+      await channel_tropa.send("**Não tem descontos hoje!**")
 
     else:
       discounts = ""
       await channel.send("**Descontos do dia**")
+      await channel_tropa.send("**Não tem descontos hoje!**")
       for game in deals_list:
         buffer = textwrap.dedent(
             f"""
@@ -101,12 +105,14 @@ async def get_discount() -> list:
 
         if len(discounts) + len(buffer) > MAX_LENGTH:
             await channel.send(discounts)
+            await channel_tropa.send(discounts)
             discounts = buffer
 
         else:
             discounts += buffer
 
     await channel.send(discounts)
+    await channel_tropa.send(discounts)
 
 
 @client.event

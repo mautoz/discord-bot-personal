@@ -31,10 +31,7 @@ BOTS = {
 BOTS_TROPA = {
     "IMDB": "imdb_bot_td.py",
     "Welcome": "welcome_member_td.py",
-    "Youtube_Search": "youtube_bot_td.py",
-    "Youtube_News": "youtube_loop_bot_td.py",
-    "Tweet_Scraper": "tweet_bot.py",
-    "Games_deals": "games_deals_bot"
+    "Youtube_Search": "youtube_bot_td.py"
 }
 
 

@@ -14,7 +14,6 @@ load_dotenv()
 
 CHANNELS_ID_YT = {
     "Marvel Brasil": "UCItRs-h8YU1wRRfP637614w",
-    "Marvel Entertainment": "UCvC4D8onUfXzvjTOM-dBfEA",
     "Netflix Brasil": "UCc1l5mTmAv2GC_PXrBpqyKQ",
     "20th Century Studios Brasil": "UCTFbGAgp5L6IgUTQDW93zlQ",
     "Paramount Brasil": "UCgqD3GdUEfupsdY1kmFLIrw",
@@ -23,8 +22,13 @@ CHANNELS_ID_YT = {
     "Warner Channel Brasil": "UC8msOgi2CPRQKqwSK-nKwtA",
     "Warner Bros. Pictures Brasil": "UCEOVI4AmQE01FDKNFunkV2w",
     "TrailersBR": "UCF0SVZVMvkPIFGk3gu_GuNg",
-    "HBO Brasil": "UCX2M7xn-jMmq4KfX25TCTCA",
-    "Walt Disney Studios BR": "UCP6nJ-Elnfnpjv6HQRsv1Cw",
+    "StarPLusBr": "UC0OEW6doCsgCxVBVd4q6Rpw",
+    "DisneyPlusbr": "UCApaSzvP6jM9rfs8UbcqD1g",
+    "HBOMAXBR": "UCR7ZwQz60rW9dK59Dirdc8w",
+    "GameSpotTrailers": "UCUnRn1f78foyP26XGkRfWsA",
+    "fasdecinemabr": "UC5XG4yYM-_DQ-3HPRuam76Q",
+    "gametrailers": "UCJx5KP-pCUmL9eZUv-mIcNw",
+    "lionsgatemovies": "UCJ6nMHaJPZvsJ-HmUmj1SeA",
     "Universal Pictures Brasil": "UCwhVCdYsd-A32RECPqJUoPg",
     "Sony Pictures Brasil": "UC9NXpIA01HVRhYgcEbs80Nw",
     "Rotten Tomatoes Trailers": "UCi8e0iOVk1fEOogdfu4YgfA",
