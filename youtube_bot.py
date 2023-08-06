@@ -16,14 +16,14 @@ intents.messages = True
 bot = commands.Bot(command_prefix="$", intents=intents)
 
 CHANNEL_ID = int(os.getenv("YOUTUBE_CHANNEL"))
-
+CHANNEL_ID_SKYNET = int(os.getenv("YOUTUBE_CHANNEL_HAL"))
 
 @bot.command()
 async def getid(ctx, arg):
     """
     Fill
     """
-    if ctx.channel.id == CHANNEL_ID:
+    if ctx.channel.id == CHANNEL_ID or ctx.channel.id == CHANNEL_ID_SKYNET:
         channel = str(arg).strip()
 
         if str(arg).strip():
@@ -43,7 +43,7 @@ async def channels(ctx):
     """
     Print a list with the current Youtube channels in the script.
     """
-    if ctx.channel.id == CHANNEL_ID:
+    if ctx.channel.id == CHANNEL_ID or ctx.channel.id == CHANNEL_ID_SKYNET:
         buffer = []
         for channel, _ in CHANNELS_ID_YT.items():
             buffer.append(channel)
@@ -61,7 +61,7 @@ async def last(ctx, arg):
     """
     Get the videos published in the last 24 hours.
     """
-    if ctx.channel.id == CHANNEL_ID:
+    if ctx.channel.id == CHANNEL_ID or ctx.channel.id == CHANNEL_ID_SKYNET:
         googleytapi = GoogleYTAPI()
         videos = googleytapi.search_last_videos(str(arg))
         if videos:
@@ -98,7 +98,7 @@ async def searchchannel(ctx, arg):
     search for the ID from a Youtube Channel. Example:
     $searchchannel DisneyPlus
     """
-    if ctx.channel.id == CHANNEL_ID:
+    if ctx.channel.id == CHANNEL_ID or ctx.channel.id == CHANNEL_ID_SKYNET:
         googleytapi = GoogleYTAPI()
         id_channel = googleytapi.search_channel_id(str(arg))
         if id_channel:
