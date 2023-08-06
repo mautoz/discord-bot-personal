@@ -29,25 +29,21 @@ async def last_videos():
     channel_hal = client.get_channel(CHANNEL_ID_HAL)
 
     await channel.send(
-            f"Verificando atualizações recentes nos canais de YouTube..."
-        )
+        f"Verificando atualizações recentes nos canais de YouTube..."
+    )
     await channel_hal.send(
         f"Verificando atualizações recentes nos canais de YouTube..."
     )
 
-    with GoogleYTAPI() as googleytapi:     
+    with GoogleYTAPI() as googleytapi:
         message = ""
         for yt_channel, yt_id in CHANNELS_ID_YT.items():
-            try: 
+            try:
                 videos = googleytapi.search_last_videos(str(yt_id))
 
             except Exception as error:
-                await channel.send(
-                    f"Erro na busca por {yt_channel}"
-                )
-                await channel_hal.send(
-                    f"Erro na busca por {yt_channel}"
-                )
+                await channel.send(f"Erro na busca por {yt_channel}")
+                await channel_hal.send(f"Erro na busca por {yt_channel}")
                 print(error)
 
             else:
@@ -57,7 +53,9 @@ async def last_videos():
                             video.get("id", None).get("videoId", None)
                         ).strip()
                         channel_name = str(
-                            video.get("snippet", None).get("channelTitle", None)
+                            video.get("snippet", None).get(
+                                "channelTitle", None
+                            )
                         ).strip()
                         publish_time = str(
                             video.get("snippet", None).get("publishTime", None)

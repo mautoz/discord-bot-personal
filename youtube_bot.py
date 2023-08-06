@@ -41,7 +41,7 @@ async def getid(ctx, arg):
 @bot.command()
 async def channels(ctx):
     """
-    Fill
+    Print a list with the current Youtube channels in the script.
     """
     if ctx.channel.id == CHANNEL_ID:
         buffer = []
@@ -59,7 +59,7 @@ async def channels(ctx):
 @bot.command()
 async def last(ctx, arg):
     """
-    Fill
+    Get the videos published in the last 24 hours.
     """
     if ctx.channel.id == CHANNEL_ID:
         googleytapi = GoogleYTAPI()
@@ -95,7 +95,8 @@ async def last(ctx, arg):
 @bot.command()
 async def searchchannel(ctx, arg):
     """
-    Fill
+    search for the ID from a Youtube Channel. Example:
+    $searchchannel DisneyPlus
     """
     if ctx.channel.id == CHANNEL_ID:
         googleytapi = GoogleYTAPI()
@@ -112,20 +113,6 @@ async def searchchannel(ctx, arg):
 
     else:
         await ctx.send("Comando exclusivo do #Youtube.")
-
-
-# @bot.command()
-# async def id(ctx, arg):
-#     """
-#     Search for the imdb title using the imdb id.
-#     """
-#     if ctx.channel.id == CHANNEL_ID:
-#         googleytapi = GoogleYTAPI()
-#         result = googleytapi.search_imdb_id(str(arg), is_full=True)
-#         await ctx.send(result)
-#         del googleytapi
-#     else:
-#         await ctx.send("Comando exclusivo do #IMDB.")
 
 
 bot.run(TOKEN)

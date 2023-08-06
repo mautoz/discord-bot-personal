@@ -26,6 +26,7 @@ MAX_LENGTH = 1700
 URL_STORES_BR2 = "https://api.isthereanydeal.com/v02/web/stores/?region=br2"
 URL_DEALS_BR = "https://api.isthereanydeal.com/v01/deals/list/?key={0}&region=br2&shops={1}&sort=price%3Aasc"
 
+
 def retrive_url(url: str) -> Union[dict, None]:
     r = requests.get(url, timeout=5)
     logging.info("Status code: %s", str(r.status_code))
@@ -37,23 +38,24 @@ def retrive_url(url: str) -> Union[dict, None]:
 
 
 def get_stores() -> Union[list, None]:
-  response =  retrive_url(URL_STORES_BR2)
+    response = retrive_url(URL_STORES_BR2)
 
-  if response is None:
-    return None        
-        
-  if response.get("data") is not None:
-    stores = []
-    for store in response.get("data"):
-      stores.append(store.get('id'))
+    if response is None:
+        return None
 
-  return stores
-  
+    if response.get("data") is not None:
+        stores = []
+        for store in response.get("data"):
+            stores.append(store.get("id"))
+
+    return stores
+
 
 def convert_unix_datetime(unix_date: int):
     if unix_date is None:
         return None
-    return datetime.utcfromtimestamp(unix_date).strftime('%Y-%m-%d %H:%M:%S')
+    return datetime.utcfromtimestamp(unix_date).strftime("%Y-%m-%d %H:%M:%S")
+
 
 def insert_brackets(text: str) -> str:
     import re
@@ -75,19 +77,21 @@ async def get_discount() -> list:
     channel_tropa = client.get_channel(CHANNEL_ID_TROPA)
     stores = get_stores()
 
-    deals = retrive_url(URL_DEALS_BR.format(os.getenv('ITAD_API_KEY'), "%2C".join(stores)))
-    deals_list = deals.get('data').get('list')
+    deals = retrive_url(
+        URL_DEALS_BR.format(os.getenv("ITAD_API_KEY"), "%2C".join(stores))
+    )
+    deals_list = deals.get("data").get("list")
     if deals_list is None:
-      await channel.send("**Não tem descontos hoje!**")
-      await channel_tropa.send("**Não tem descontos hoje!**")
+        await channel.send("**Não tem descontos hoje!**")
+        await channel_tropa.send("**Não tem descontos hoje!**")
 
     else:
-      discounts = ""
-      await channel.send("**Descontos do dia**")
-      await channel_tropa.send("**Não tem descontos hoje!**")
-      for game in deals_list:
-        buffer = textwrap.dedent(
-            f"""
+        discounts = ""
+        await channel.send("**Descontos do dia**")
+        await channel_tropa.send("**Não tem descontos hoje!**")
+        for game in deals_list:
+            buffer = textwrap.dedent(
+                f"""
             \u200b```Game: {game.get('title', None)}\n
             \u200bShop: {game.get('shop', None).get('name', None)}\n
             \u200bPrice Cut: {game.get('price_cut', None)}\n
@@ -95,21 +99,21 @@ async def get_discount() -> list:
             \u200bPrice Old: {game.get('price_old', None)}\n
             \u200bExpire: {convert_unix_datetime(game.get('expiry'))}```\n
             """
-        )
+            )
 
-        buffer += textwrap.dedent(
-            f"""
+            buffer += textwrap.dedent(
+                f"""
             \u200bComprar: {game.get('urls', None).get('buy', None)}\n
             """
-        )
+            )
 
-        if len(discounts) + len(buffer) > MAX_LENGTH:
-            await channel.send(discounts)
-            await channel_tropa.send(discounts)
-            discounts = buffer
+            if len(discounts) + len(buffer) > MAX_LENGTH:
+                await channel.send(discounts)
+                await channel_tropa.send(discounts)
+                discounts = buffer
 
-        else:
-            discounts += buffer
+            else:
+                discounts += buffer
 
     await channel.send(discounts)
     await channel_tropa.send(discounts)

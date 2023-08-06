@@ -25,13 +25,15 @@ BOTS = {
     "Youtube_Search": "youtube_bot.py",
     "Youtube_News": "youtube_loop_bot.py",
     "Tweet_Scraper": "tweet_bot.py",
-    "Games_deals": "games_deals_bot"
+    "Games_deals": "games_deals_bot",
+    "Movies_upcoming": "movies_upcoming_bot",
+    "Movies_cast": "movies_cast_bot",
 }
 
 BOTS_TROPA = {
     "IMDB": "imdb_bot_td.py",
     "Welcome": "welcome_member_td.py",
-    "Youtube_Search": "youtube_bot_td.py"
+    "Youtube_Search": "youtube_bot_td.py",
 }
 
 
@@ -65,6 +67,8 @@ status_embed.add_field(name="Youtube_Search", value="Offline")
 status_embed.add_field(name="Youtube_News", value="Offline")
 status_embed.add_field(name="Tweet_Scraper", value="Offline")
 status_embed.add_field(name="Games_deals", value="Offline")
+status_embed.add_field(name="Movies_cast", value="Offline")
+status_embed.add_field(name="Movies_upcoming", value="Offline")
 status_embed.add_field(name="Last update", value="Offline")
 
 # Tropa
