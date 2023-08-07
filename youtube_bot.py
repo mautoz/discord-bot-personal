@@ -10,7 +10,7 @@ from tools.googleytapi import GoogleYTAPI, CHANNELS_ID_YT
 
 load_dotenv()
 
-TOKEN = os.getenv("DISCORD_TOKEN")
+TOKEN = os.getenv("DISCORD_TOKEN_GERO")
 intents = discord.Intents.default()
 intents.messages = True
 bot = commands.Bot(command_prefix="$", intents=intents)
