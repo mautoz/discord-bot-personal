@@ -157,7 +157,7 @@ async def last_upcoming_movies():
 async def on_ready():
     while True:
         await last_upcoming_movies()
-        await asyncio.sleep(86400)
+        await asyncio.sleep(timedelta(weeks=1).total_seconds())
 
 
 client.run(TOKEN)
