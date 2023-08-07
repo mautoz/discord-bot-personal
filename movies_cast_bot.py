@@ -49,7 +49,10 @@ async def getcast(ctx, arg):
         themoviesdb = TheMoviesDB()
         cast = themoviesdb.get_cast(str(arg))
         if cast:
-            await ctx.send(cast)
+            max_chunk_size = 1500
+            for i in range(0, len(cast), max_chunk_size):
+                chunk = cast[i : i + max_chunk_size]
+                await ctx.send(chunk)
         else:
             await ctx.send("Verifique o ID digitado")
 
@@ -90,7 +93,10 @@ async def getcastserie(ctx, arg):
         themoviesdb = TheMoviesDB()
         cast = themoviesdb.get_cast_tv_show(str(arg))
         if cast:
-            await ctx.send(cast)
+            max_chunk_size = 1500
+            for i in range(0, len(cast), max_chunk_size):
+                chunk = cast[i : i + max_chunk_size]
+                await ctx.send(chunk)
         else:
             await ctx.send("Verifique o ID digitado")
 
@@ -108,11 +114,11 @@ async def getmovieposter(ctx, arg):
     """
     if ctx.channel.id == CHANNEL_ID or ctx.channel.id == CHANNEL_ID_SKYNET:
         themoviesdb = TheMoviesDB()
-        cast = themoviesdb.get_poster_movie(str(arg))
-        if cast:
+        imgs = themoviesdb.get_poster_movie(str(arg))
+        if imgs:
             max_chunk_size = 1500
-            for i in range(0, len(cast), max_chunk_size):
-                chunk = cast[i : i + max_chunk_size]
+            for i in range(0, len(imgs), max_chunk_size):
+                chunk = imgs[i : i + max_chunk_size]
                 await ctx.send(chunk)
 
         else:
@@ -132,11 +138,11 @@ async def getserieposter(ctx, arg):
     """
     if ctx.channel.id == CHANNEL_ID or ctx.channel.id == CHANNEL_ID_SKYNET:
         themoviesdb = TheMoviesDB()
-        cast = themoviesdb.get_poster_serie(str(arg))
-        if cast:
+        imgs = themoviesdb.get_poster_serie(str(arg))
+        if imgs:
             max_chunk_size = 1500
-            for i in range(0, len(cast), max_chunk_size):
-                chunk = cast[i : i + max_chunk_size]
+            for i in range(0, len(imgs), max_chunk_size):
+                chunk = imgs[i : i + max_chunk_size]
                 await ctx.send(chunk)
 
         else:

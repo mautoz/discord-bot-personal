@@ -21,7 +21,7 @@ CHANNEL_ID_SKYNET = int(os.getenv("YOUTUBE_CHANNEL_HAL"))
 @bot.command()
 async def getid(ctx, arg):
     """
-    Fill
+    Get the ID from a Channel in the script.
     """
     if ctx.channel.id == CHANNEL_ID or ctx.channel.id == CHANNEL_ID_SKYNET:
         channel = str(arg).strip()
@@ -95,7 +95,7 @@ async def last(ctx, arg):
 @bot.command()
 async def searchchannel(ctx, arg):
     """
-    search for the ID from a Youtube Channel. Example:
+    Search for the ID from a Youtube Channel. Example:
     $searchchannel DisneyPlus
     """
     if ctx.channel.id == CHANNEL_ID or ctx.channel.id == CHANNEL_ID_SKYNET:
