@@ -88,7 +88,7 @@ async def get_discount() -> list:
     else:
         discounts = ""
         await channel.send("**Descontos do dia**")
-        await channel_tropa.send("**Não tem descontos hoje!**")
+        await channel_tropa.send("**Descontos do dia**")
         for game in deals_list:
             buffer = textwrap.dedent(
                 f"""
