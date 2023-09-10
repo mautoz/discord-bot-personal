@@ -6,6 +6,8 @@ import os
 import sys
 import requests
 from bs4 import BeautifulSoup
+from dotenv import load_dotenv
+load_dotenv()
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
