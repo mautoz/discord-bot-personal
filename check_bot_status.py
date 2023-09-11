@@ -28,6 +28,8 @@ BOTS = {
     "Games_deals": "games_deals_bot",
     "Movies_upcoming": "movies_upcoming_bot",
     "Movies_cast": "movies_cast_bot",
+    "Entertainment_news": "entertainment_news_bot",
+    "Datena": "locate_last_screenshots_bot"
 }
 
 BOTS_TROPA = {
@@ -69,6 +71,8 @@ status_embed.add_field(name="Tweet_Scraper", value="Offline")
 status_embed.add_field(name="Games_deals", value="Offline")
 status_embed.add_field(name="Movies_cast", value="Offline")
 status_embed.add_field(name="Movies_upcoming", value="Offline")
+status_embed.add_field(name="Entertainment_news", value="Offline")
+status_embed.add_field(name="Datena", value="Offline")
 status_embed.add_field(name="Last update", value="Offline")
 
 # Tropa
