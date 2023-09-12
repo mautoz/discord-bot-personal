@@ -62,10 +62,10 @@ DATENA_QUOTES = [
 
 
 def get_last_screenshots() -> list:
-    current_directory = os.getcwd()
+    screenschots_directory = os.getenv('SCREENSHOT_DIRECTORY')
     png_files = [
         filename
-        for filename in os.listdir(current_directory)
+        for filename in os.listdir(screenschots_directory)
         if filename.endswith(".png")
     ]
 
@@ -73,8 +73,8 @@ def get_last_screenshots() -> list:
     file_dates = {}
 
     for filename in png_files:
-        print(type(current_directory), type(filename))
-        full_path = os.path.join(str(current_directory), str(filename))
+        print(type(screenschots_directory), type(filename))
+        full_path = os.path.join(str(screenschots_directory), str(filename))
         stat_info = os.stat(full_path)
         timestamp = stat_info.st_mtime
         date = datetime.fromtimestamp(timestamp)
@@ -102,7 +102,7 @@ def medaibagens(update, context):
     chat_id = update.message.chat_id
 
     # Specify the folder where your images are located
-    current_directory = os.getcwd()
+    screenschots_directory = os.getenv('SCREENSHOT_DIRECTORY')
 
     images_files = get_last_screenshots()
 
@@ -114,7 +114,7 @@ def medaibagens(update, context):
     # Iterate through the image files and send each one
     for image_file in images_files:
         with open(
-            os.path.join(current_directory, image_file[0]), "rb"
+            os.path.join(screenschots_directory, image_file[0]), "rb"
         ) as image:
             bot.send_photo(chat_id, photo=image)
 
