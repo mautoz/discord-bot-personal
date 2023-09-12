@@ -19,9 +19,6 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-THIS_DAY = datetime.today()
-LAST_WEEK = THIS_DAY - timedelta(days=7)
-
 DATENA_QUOTES = [
     "No Brasil, o Presidente da República é quem manda menos!",
     "Mudem as leis!",
@@ -60,6 +57,8 @@ DATENA_QUOTES = [
     "Tá de brincadeira comigo!",
 ]
 
+THIS_DAY = datetime.today()
+LAST_WEEK = THIS_DAY - timedelta(days=7)
 
 def get_last_screenshots() -> list:
     screenschots_directory = os.getenv('SCREENSHOT_DIRECTORY')
@@ -78,7 +77,7 @@ def get_last_screenshots() -> list:
         stat_info = os.stat(full_path)
         timestamp = stat_info.st_mtime
         date = datetime.fromtimestamp(timestamp)
-        if date > LAST_WEEK and date <= THIS_DAY:
+        if date > LAST_WEEK:
             file_dates[filename] = date
 
     sorted_files = sorted(file_dates.items(), key=lambda x: x[1])
