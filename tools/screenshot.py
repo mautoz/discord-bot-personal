@@ -6,13 +6,16 @@ import os
 import sys
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
+from dotenv import load_dotenv
+
+load_dotenv()
 
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 
 USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36"
 SCREENSHOT_DIRECTORY = os.getenv("SCREENSHOT_DIRECTORY")
 
-
+print(str(SCREENSHOT_DIRECTORY))
 def get_screenshots(links: list) -> None:
     for link in links:
         try:
@@ -24,9 +27,9 @@ def get_screenshots(links: list) -> None:
             driver.set_window_size(800, 600)
             driver.get(link)
             name = link.split("/")[-2]
-            driver.save_screenshot(
-                os.path.join(SCREENSHOT_DIRECTORY, f"{name}.png")
-            )
+            img_path = os.path.join(str(SCREENSHOT_DIRECTORY), f"{name}.png")
+            logging.info("Image path: %s", str(img_path))
+            driver.save_screenshot(img_path)            
             driver.quit()
 
             sleep_duration = random.uniform(60, 180)
