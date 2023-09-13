@@ -3,10 +3,9 @@ import os
 from datetime import datetime, timedelta
 import logging
 import random
-from telegram import Bot
-from telegram.ext import Updater, CommandHandler
+from telegram import Bot, Update
+from telegram.ext import Updater, CommandHandler, CallbackContext
 from dotenv import load_dotenv
-
 
 load_dotenv()
 bot = Bot(token=os.getenv("TELEGRAM_TOKEN_SCREENSHOT"))
@@ -18,6 +17,8 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger(__name__)
+
+DEFAULT_URL = os.getenv("DEFAULT_JN_URL")
 
 DATENA_QUOTES = [
     "No Brasil, o Presidente da República é quem manda menos!",
@@ -58,9 +59,10 @@ DATENA_QUOTES = [
 ]
 
 THIS_DAY = datetime.today()
-LAST_WEEK = THIS_DAY - timedelta(days=7)
 
-def get_last_screenshots() -> list:
+def get_last_screenshots(days: int) -> list:
+    days_before = THIS_DAY - timedelta(days=days)
+
     screenschots_directory = os.getenv('SCREENSHOT_DIRECTORY')
     png_files = [
         filename
@@ -68,16 +70,14 @@ def get_last_screenshots() -> list:
         if filename.endswith(".png")
     ]
 
-    print(png_files)
     file_dates = {}
 
     for filename in png_files:
-        print(type(screenschots_directory), type(filename))
         full_path = os.path.join(str(screenschots_directory), str(filename))
         stat_info = os.stat(full_path)
         timestamp = stat_info.st_mtime
         date = datetime.fromtimestamp(timestamp)
-        if date > LAST_WEEK:
+        if date > days_before:
             file_dates[filename] = date
 
     sorted_files = sorted(file_dates.items(), key=lambda x: x[1])
@@ -86,36 +86,93 @@ def get_last_screenshots() -> list:
     return sorted_files
 
 
+def get_photo_msg(update, days: int, chat_id: int, want_img: bool = False):
+    chat_id = update.message.chat_id
+
+    screenschots_directory = os.getenv('SCREENSHOT_DIRECTORY')
+
+    images_files = get_last_screenshots(days)
+
+    if not images_files:
+        update.message.reply_text(f"Sem screenshots novos para {days} dia(s) atrás!")
+        return
+
+    update.message.reply_text(random.choice(DATENA_QUOTES))
+    for image_file in images_files:
+        with open(
+            os.path.join(screenschots_directory, image_file[0]), "rb"
+        ) as image:
+            image_name = str(image_file[0]).split(".")
+            if want_img:
+                bot.send_photo(chat_id, photo=image)
+            bot.send_message(
+                chat_id,
+                f"{DEFAULT_URL}{image_name[0]}"
+            )
+
+
+def medaibagens(update, context):
+    chat_id = update.message.chat_id
+    try:
+        if not context.args:
+            bot.send_message(
+                chat_id,
+                "Você não forneceu um intervalo de dias! Faça algo como medaibagens 7 (para os últimos 7 dias)"
+            )
+        else:
+            interval = int(context.args[0])
+
+    except ValueError:
+        bot.send_message(
+                chat_id,
+                "O intervalo de dias dado não é válido!"
+            )
+
+    else: 
+        if interval >=0:
+            get_photo_msg(update, interval, chat_id, want_img=True)
+        else:
+            bot.send_message(
+                chat_id,
+                "Aqui não é De Volta Para O Futuro! Digite um número maior que zero!"
+            )
+
+
+def medalinks(update, context):
+    chat_id = update.message.chat_id
+    try:
+        if not context.args:
+            bot.send_message(
+                chat_id,
+                "Você não forneceu um intervalo de dias! Faça algo como medalinks 7 (para os últimos 7 dias)"
+            )
+        else:
+            interval = int(context.args[0])
+
+
+    except ValueError:        
+        bot.send_message(
+                chat_id,
+                "O intervalo de dias dado não é válido!"
+            )
+
+    else: 
+        if interval >=0:
+            get_photo_msg(update, interval, chat_id)
+        else:
+            bot.send_message(
+                chat_id,
+                "Aqui não é De Volta Para O Futuro! Digite um número maior que zero!"
+            )
+
+
 def start(update, context):
     """Send a message when the command /start is issued."""
     update.message.reply_text("Type /help if it's your first time!")
 
 
-def help(update, context):
-    """Send a message when the command /help is issued."""
-    update.message.reply_text("/medaibagens")
-
-
-def medaibagens(update, context):
-    # Get the chat ID
-    chat_id = update.message.chat_id
-
-    # Specify the folder where your images are located
-    screenschots_directory = os.getenv('SCREENSHOT_DIRECTORY')
-
-    images_files = get_last_screenshots()
-
-    if not images_files:
-        update.message.reply_text("Sem screenshots novos")
-        return
-
+def datena(update, context):
     update.message.reply_text(random.choice(DATENA_QUOTES))
-    # Iterate through the image files and send each one
-    for image_file in images_files:
-        with open(
-            os.path.join(screenschots_directory, image_file[0]), "rb"
-        ) as image:
-            bot.send_photo(chat_id, photo=image)
 
 
 def error(update, context):
@@ -123,9 +180,22 @@ def error(update, context):
     logger.warning('Update "%s" caused error "%s"', update, context.error)
 
 
+def help_command(update: Update, context: CallbackContext) -> None:
+    """Send a message with information about available commands."""
+    user = update.effective_user
+    message = (
+        f"Olá, {user.mention_markdown_v2()}\n"
+        "Comandos válidos:\n\n"
+        "/help Mostra os comandos atuais\n"
+        "/datena Frases aleatórias do Datena\n"
+        "/medaibagens N Troque N pelo número de dias retroativos que deseja\n"
+        "/medalinks N Troque N pelo número de dias retroativos que deseja"
+    )
+    update.message.reply_markdown_v2(message)
+
+
 def main():
     """Start the bot."""
-    # Here is where you will put your token
     updater = Updater(
         token=os.getenv("TELEGRAM_TOKEN_SCREENSHOT"), use_context=True
     )
@@ -133,8 +203,10 @@ def main():
 
     # My commands
     dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler("medaibagens", medaibagens))
+    dp.add_handler(CommandHandler("medalinks", medalinks))
+    dp.add_handler(CommandHandler("datena", datena))
+    dp.add_handler(CommandHandler("help", help_command))
 
     # Errors
     dp.add_error_handler(error)
