@@ -32,6 +32,8 @@ CHANNELS_ID_YT = {
     "Universal Pictures Brasil": "UCwhVCdYsd-A32RECPqJUoPg",
     "Sony Pictures Brasil": "UC9NXpIA01HVRhYgcEbs80Nw",
     "Rotten Tomatoes Trailers": "UCi8e0iOVk1fEOogdfu4YgfA",
+    "CrunchyrollBR": "UCVc-JLY3Db6-O48y7TS4N7Q",
+    "parisfilmes": "UCJmCTfaqgP5AWqfQCF21fPg"
 }
 
 
