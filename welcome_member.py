@@ -34,7 +34,7 @@ async def on_member_remove(member):
     Show a goodbye message when a user leaves the server.
     """
     # Get the server's general text channel dynamically
-    channel = discord.utils.get(member.guild.text_channels, name="geral")
+    channel = client.get_channel(GERAL_CHANNEL)
     
     if channel is None:
         print(f"No channel named 'geral' found in server: {member.guild.name}")
