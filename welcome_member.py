@@ -8,6 +8,7 @@ intents = discord.Intents.all()
 
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
+GERAL_CHANNEL = int(os.getenv("GERAL_CHANNEL"))
 
 client = discord.Client(intents=intents)
 
@@ -17,17 +18,13 @@ async def on_member_join(member):
     """
     Show a message to the new user.
     """
-    channel = discord.utils.get(member.guild.text_channels, name="geral")
-    if channel is None:
-        print(f"No channel named 'geral' found in server: {member.guild.name}")
-        return
-    
+    channel = client.get_channel(GERAL_CHANNEL)
     server_name = member.guild.name
     message = f"Bem-vindo/bem-vinda {member.mention} ao {server_name}! Por favor, leia as #regras antes de começar a utilizar o server!"
     embed = discord.Embed(
         title="Welcome!", description=message, color=discord.Color.green()
     )
-    embed.set_thumbnail(url=member.avatar.url if member.avatar else member.default_avatar.url)
+    embed.set_thumbnail(url=member.avatar_url)
     await channel.send(embed=embed)
 
 
