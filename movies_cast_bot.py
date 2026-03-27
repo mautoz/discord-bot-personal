@@ -11,7 +11,7 @@ load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN_WALLE")
 intents = discord.Intents.default()
 intents.message_content = True
-bot = commands.Bot(command_prefix="$", intents=intents)
+bot = commands.Bot(command_prefix="$", intents=intents, help_command=None)
 
 CHANNEL_ID = int(os.getenv("IMDB_CHANNEL"))
 CHANNEL_ID_SKYNET = int(os.getenv("IMDB_CHANNEL_SKYNET"))
