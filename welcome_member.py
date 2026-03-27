@@ -15,41 +15,40 @@ client = discord.Client(intents=intents)
 
 @client.event
 async def on_member_join(member):
-    """
-    Show a message to the new user.
-    """
     channel = client.get_channel(GERAL_CHANNEL)
-    server_name = member.guild.name
-    message = f"Bem-vindo/bem-vinda {member.mention} ao {server_name}! Por favor, leia as #regras antes de começar a utilizar o server!"
+    if channel is None:
+        return
+
     embed = discord.Embed(
-        title="Welcome!", description=message, color=discord.Color.green()
+        title="👋 Bem-vindo(a)!",
+        description=f"Olá {member.mention}, seja bem-vindo(a) ao **{member.guild.name}**!\nPor favor, leia as <#regras> antes de começar.",
+        color=discord.Color.green(),
     )
-    embed.set_thumbnail(url=member.avatar_url)
+    embed.set_thumbnail(url=member.display_avatar.url)
+    embed.set_footer(text=f"Membro #{member.guild.member_count}")
     await channel.send(embed=embed)
 
 
 @client.event
 async def on_member_remove(member):
-    """
-    Show a goodbye message when a user leaves the server.
-    """
-    # Get the server's general text channel dynamically
     channel = client.get_channel(GERAL_CHANNEL)
-    
     if channel is None:
-        print(f"No channel named 'geral' found in server: {member.guild.name}")
         return
-    
-    server_name = member.guild.name
-    message = f"""{member.name} saiu do {server_name}. Sentiremos sua falta!
-    Até logo, até mais ver, bon voyage, arrivederci, até mais, adeus, boa viagem, 
-    vá em paz, que a porta bata onde o sol não bate, não volte mais aqui, hasta la vista, 
-    baby, escafeda-se e saia logo.
-    """
-    embed = discord.Embed(
-        title="Goodbye!", description=message, color=discord.Color.red()
+
+    farewell = (
+        "Até logo, até mais ver, bon voyage, arrivederci, até mais, adeus, boa viagem, "
+        "vá em paz, que a porta bata onde o sol não bate, não volte mais aqui, hasta la vista, "
+        "baby, escafeda-se e saia logo."
     )
-    embed.set_thumbnail(url=member.avatar.url if member.avatar else member.default_avatar.url)
+
+    embed = discord.Embed(
+        title="👋 Até logo!",
+        description=f"**{member.name}** saiu do servidor. Sentiremos sua falta!\n_{farewell}_",
+        color=discord.Color.red(),
+    )
+    embed.set_thumbnail(url=member.display_avatar.url)
+    embed.set_footer(text=f"{member.guild.name}")
     await channel.send(embed=embed)
+
 
 client.run(TOKEN)

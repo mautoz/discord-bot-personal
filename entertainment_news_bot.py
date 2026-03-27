@@ -1,11 +1,10 @@
-#!/usr/bin/env python3.8
+#!/usr/bin/env python3
 import logging
 from typing import Union
 import os
 import sys
 from datetime import datetime, timedelta
 import asyncio
-import textwrap
 from newsapi import NewsApiClient
 import discord
 from discord.ext import commands
@@ -23,147 +22,99 @@ TOKEN = os.getenv("DISCORD_TOKEN_HAL")
 CHANNEL_ID_SKYNET = int(os.getenv("SKYNET_NEWS_CHANNEL"))
 CHANNEL_ID_TROPA = int(os.getenv("TROPA_NEWS_CHANNEL"))
 
-MAX_LENGTH = 1700
-
 API_KEY = os.getenv("NEWS_API_KEY")
-
-
 newsapi = NewsApiClient(api_key=API_KEY)
-# endpoint = f"https://newsapi.org/v2/top-headlines/sources?language=en&category=entertainment&apiKey={API_KEY}"
-# endpoint = "https://newsapi.org/v2/everything?language=en,pt&q={0}&apiKey={1}"
 endpoint = "https://newsapi.org/v2/top-headlines?country={0}&category=entertainment&apiKey={1}"
 
 
 def retrive_url(url: str) -> Union[dict, None]:
     r = requests.get(url, timeout=5)
     logging.info("Status code: %s", str(r.status_code))
-
     if r.status_code == 200:
         return r.json()
-
     return None
 
-HOJE = datetime.today()
-ONTEM = HOJE - timedelta(days=1)
-SUBJECTS = ['movie', 'trailer', 'teaser', 'game', 'tv']
 
 def get_raw_data(country: str):
-    # all_articles = newsapi.get_everything(q=subject,
-    #                                       sources='entertainment-weekly,mashable,ign',
-    #                                       from_param=ONTEM,
-    #                                       to=HOJE,
-    #                                       language='en',
-    #                                       sort_by='relevancy')
     url = endpoint.format(country, API_KEY)
     logging.info(url)
-    news = retrive_url(url)
-    
-    if news:
-        return news
-    
-    return None
+    return retrive_url(url)
+
+
+def build_article_embed(article: dict, color: discord.Color) -> discord.Embed:
+    title = article.get("title", "Sem título")
+    source = article.get("source", {}).get("name") or article.get("author") or "Desconhecida"
+    url = article.get("url")
+    image = article.get("urlToImage")
+    published = article.get("publishedAt", "")
+    description = article.get("description") or ""
+
+    try:
+        dt = datetime.fromisoformat(published.replace("Z", "+00:00"))
+        published = dt.strftime("%d/%m/%Y %H:%M")
+    except Exception:
+        pass
+
+    embed = discord.Embed(
+        title=title,
+        url=url,
+        description=description[:200] + "..." if len(description) > 200 else description,
+        color=color,
+    )
+    embed.add_field(name="📰 Fonte", value=source, inline=True)
+    embed.add_field(name="🕐 Publicado", value=published, inline=True)
+    if url:
+        embed.add_field(name="🔗 Link", value=f"[Leia mais]({url})", inline=False)
+    if image:
+        embed.set_thumbnail(url=image)
+    embed.set_footer(text="NewsAPI")
+    return embed
+
+
+async def send_news(ctx, country: str, label: str, color: discord.Color):
+    news = get_raw_data(country)
+    try:
+        articles = news.get("articles", [])
+    except Exception as error:
+        logging.error(error)
+        await ctx.send("**Sem novas notícias ou algum erro ocorreu. Notifique o admin!**")
+        return
+
+    if not articles:
+        await ctx.send(embed=discord.Embed(
+            title=f"📰 Notícias — {label}",
+            description="Nenhuma notícia encontrada.",
+            color=discord.Color.greyple(),
+        ))
+        return
+
+    await ctx.send(embed=discord.Embed(
+        title=f"📰 Notícias de entretenimento — {label}",
+        description=f"{datetime.today().strftime('%d/%m/%Y')} · {len(articles)} artigos",
+        color=color,
+    ))
+
+    for article in articles:
+        title = article.get("title", "")
+        if "removed" in str(title).lower():
+            continue
+        await ctx.send(embed=build_article_embed(article, color))
+
 
 @bot.command()
 async def queronoticias(ctx):
-    # for subject in SUBJECTS[:1]:
-    if ctx.channel.id == CHANNEL_ID_SKYNET or ctx.channel.id == CHANNEL_ID_TROPA:
-        news = get_raw_data("br")
-        try:
-            articles = news.get("articles", None)
-
-        except Exception as error:
-            logging.error(error)
-            await ctx.send(f"**Sem novas notícias ou algum erro ocorreu. Notifique o admin!**")  
-
-        else:
-            logging.error("Existem notícias em PT-BR")
-
-            await ctx.send(f"**Notícias ({datetime.today()}) das últimas 24hs em Português**")
-            last_news = "" 
-            for article in articles:
-                title = article.get('title', None)
-                if "removed" in str(title).lower():
-                    continue
-
-                logging.info(article)           
-
-                buffer = textwrap.dedent(
-                    f"""
-                    \u200b```Título: {title}\n
-                    \u200bFonte: {article.get('author', None)}\n
-                    \u200bPublicado em: {article.get('publishedAt', None)}\n
-                    \u200bURL: {article.get('url', None)}\n
-                    ```\n
-                    """
-                )
-
-                if len(last_news) + len(buffer) > MAX_LENGTH:
-                    await ctx.send(last_news)
-
-                    last_news = buffer
-
-                else:
-                    last_news += buffer
-
-            await ctx.send(last_news)
-
-
+    if ctx.channel.id in (CHANNEL_ID_SKYNET, CHANNEL_ID_TROPA):
+        await send_news(ctx, "br", "PT-BR 🇧🇷", discord.Color.green())
     else:
         await ctx.send("Comando exclusivo do canal #News.")
 
 
 @bot.command()
 async def queronews(ctx):
-# async def get_news() -> list:
-    channel = client.get_channel(CHANNEL_ID_SKYNET)
-    channel_tropa = client.get_channel(CHANNEL_ID_TROPA)
-
-    # for subject in SUBJECTS[:1]:
-    if ctx.channel.id == CHANNEL_ID_SKYNET or ctx.channel.id == CHANNEL_ID_TROPA:
-        news = get_raw_data("us")
-        try:
-            articles = news.get("articles", None)
-
-        except Exception as error:
-            logging.error(error)
-            await ctx.send(f"**Sem novas notícias ou algum erro ocorreu. Notifique o admin!**")  
-
-        else:
-            logging.error("Existem notícias em EN-US")
-
-            await ctx.send(f"**Notícias ({datetime.today()}) das últimas 24hs em Inglês**")
-            last_news = "" 
-            for article in articles:
-                logging.info(article)           
-
-                buffer = textwrap.dedent(
-                    f"""
-                    \u200b```Título: {article.get('title', None)}\n
-                    \u200bFonte: {article.get('author', None)}\n
-                    \u200bPublicado em: {article.get('publishedAt', None)}\n
-                    \u200bURL: {article.get('url', None)}\n
-                    ```\n
-                    """
-                )
-
-                # buffer += textwrap.dedent(
-                #     f"""
-                #     \u200bURL Image: {article.get('urlToImage', None)}\n
-                #     """
-                # )
-
-                if len(last_news) + len(buffer) > MAX_LENGTH:
-                    await ctx.send(last_news)
-
-                    last_news = buffer
-
-                else:
-                    last_news += buffer
-
-            await ctx.send(last_news)
-
-
+    if ctx.channel.id in (CHANNEL_ID_SKYNET, CHANNEL_ID_TROPA):
+        await send_news(ctx, "us", "EN-US 🇺🇸", discord.Color.blue())
     else:
         await ctx.send("Comando exclusivo do canal #News.")
+
 
 bot.run(TOKEN)

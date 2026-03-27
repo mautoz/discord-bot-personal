@@ -61,6 +61,20 @@ class OMDBAPI:
 
         return None
 
+    def search_title_raw(self, title: str) -> Union[list, None]:
+        """Same as search_title but returns raw dicts."""
+        title_format = re.sub(r"\s+", "+", title)
+        url = DEFAULT_URL.format("?s", title_format, self._api_key)
+        response = self._retrive_url(url)
+        return response.get("Search", None) if response else None
+
+    def search_imdb_id_raw(self, imdb_id: str, is_full: bool = False) -> Union[dict, None]:
+        """Same as search_imdb_id but returns raw dict."""
+        url = DEFAULT_URL.format("?i", imdb_id, self._api_key)
+        if is_full:
+            url += "&plot=full"
+        return self._retrive_url(url)
+
     def search_imdb_id(self, imdb_id: str, is_full: bool = False) -> str:
         """
         Search for the imdb title using the imdb id.
