@@ -11,7 +11,8 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-client = discord.Client()
+intents = discord.Intents.default()
+client = discord.Client(intents=intents)
 
 TOKEN = os.getenv("DISCORD_TOKEN_HAL")
 CHANNEL_ID_SKYNET = int(os.getenv("SKYNET_GAMES_CHANNEL"))

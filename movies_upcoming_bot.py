@@ -11,7 +11,8 @@ import random
 
 load_dotenv()
 
-client = discord.Client()
+intents = discord.Intents.default()
+client = discord.Client(intents=intents)
 
 URL_DEFAULT = "https://api.themoviedb.org/3/movie/upcoming?language=pt-BR&page={0}"
 TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p/w200"
