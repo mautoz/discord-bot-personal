@@ -8,14 +8,25 @@ intents = discord.Intents.all()
 
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
-GERAL_CHANNEL = int(os.getenv("GERAL_CHANNEL"))
+GERAL_CHANNELS = [
+    int(os.getenv("GERAL_CHANNEL")),        # Skynet
+    int(os.getenv("GERAL_CHANNEL_TD")),     # Tropa Dercy
+]
 
 client = discord.Client(intents=intents)
 
 
+def get_guild_channel(guild_id: int):
+    for ch_id in GERAL_CHANNELS:
+        ch = client.get_channel(ch_id)
+        if ch and ch.guild.id == guild_id:
+            return ch
+    return None
+
+
 @client.event
 async def on_member_join(member):
-    channel = client.get_channel(GERAL_CHANNEL)
+    channel = get_guild_channel(member.guild.id)
     if channel is None:
         return
 
@@ -31,7 +42,7 @@ async def on_member_join(member):
 
 @client.event
 async def on_member_remove(member):
-    channel = client.get_channel(GERAL_CHANNEL)
+    channel = get_guild_channel(member.guild.id)
     if channel is None:
         return
 
