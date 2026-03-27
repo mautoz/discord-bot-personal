@@ -21,6 +21,7 @@ MSG_STATUS_C3PO_TD = int(os.getenv("MSG_STATUS_C3PO_TD"))
 BOTS = {
     "Welcome":            "welcome_member.py",
     "IMDB":               "imdb_bot.py",
+    "Wall-E (Movies)":    "movies_cast_bot.py",
     "Youtube":            "youtube_bot.py",
     "Games Deals":        "games_deals_bot.py",
     "Movies Upcoming":    "movies_upcoming_bot.py",
