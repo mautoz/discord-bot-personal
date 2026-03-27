@@ -58,19 +58,24 @@ async def last_videos():
 
     total = 0
     with GoogleYTAPI() as googleytapi:
+        # Collect all videos from all channels first
+        all_videos = []
         for yt_channel, yt_id in CHANNELS_ID_YT.items():
             try:
                 videos = googleytapi.search_last_videos(str(yt_id))
+                if videos:
+                    all_videos.extend(videos)
             except Exception as error:
                 print(f"Erro na busca por {yt_channel}: {error}")
-                continue
 
-            if videos:
-                for video in videos:
-                    embed = build_video_embed(video)
-                    for ch in (channel, channel_hal):
-                        await ch.send(embed=embed)
-                    total += 1
+        # Filter out Shorts in a single batched API call
+        filtered = googleytapi.filter_shorts(all_videos)
+
+        for video in filtered:
+            embed = build_video_embed(video)
+            for ch in (channel, channel_hal):
+                await ch.send(embed=embed)
+            total += 1
 
     summary = discord.Embed(
         description=f"✅ {total} vídeo(s) publicado(s) nas últimas 24h." if total else "😴 Nenhum vídeo novo nas últimas 24h.",

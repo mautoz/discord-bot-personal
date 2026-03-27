@@ -102,6 +102,56 @@ class GoogleYTAPI:
 
         return None
 
+    def filter_shorts(self, videos: list, max_duration_seconds: int = 65) -> list:
+        """
+        Filter out YouTube Shorts from a list of video items.
+        Makes a single batched videos.list call to check duration.
+
+        Parameters
+        ----------
+        videos: list
+            List of video items from search_last_videos (across all channels).
+        max_duration_seconds: int
+            Videos at or below this duration are considered Shorts. Default: 65s.
+
+        Returns
+        -------
+            Filtered list with Shorts removed.
+        """
+        if not videos:
+            return []
+
+        video_ids = [v.get("id", {}).get("videoId") for v in videos if v.get("id", {}).get("videoId")]
+        if not video_ids:
+            return videos
+
+        # Batch in groups of 50 (API limit)
+        durations = {}
+        for i in range(0, len(video_ids), 50):
+            batch = video_ids[i:i + 50]
+            response = (
+                self._youtube.videos()
+                .list(part="contentDetails", id=",".join(batch))
+                .execute()
+            )
+            for item in response.get("items", []):
+                vid_id = item["id"]
+                duration_iso = item.get("contentDetails", {}).get("duration", "PT0S")
+                durations[vid_id] = self._parse_duration(duration_iso)
+
+        return [v for v in videos if durations.get(v.get("id", {}).get("videoId"), 999) > max_duration_seconds]
+
+    def _parse_duration(self, iso_duration: str) -> int:
+        """Convert ISO 8601 duration (e.g. PT1M30S) to total seconds."""
+        import re
+        match = re.match(r'PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?', iso_duration)
+        if not match:
+            return 0
+        hours   = int(match.group(1) or 0)
+        minutes = int(match.group(2) or 0)
+        seconds = int(match.group(3) or 0)
+        return hours * 3600 + minutes * 60 + seconds
+
 
 # if __name__ == "__main__":
 #     googleytapi = GoogleYTAPI()
