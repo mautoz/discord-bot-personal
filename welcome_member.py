@@ -16,17 +16,25 @@ GERAL_CHANNELS = [
 client = discord.Client(intents=intents)
 
 
-def get_guild_channel(guild_id: int):
+async def get_guild_channel(guild_id: int):
     for ch_id in GERAL_CHANNELS:
         ch = client.get_channel(ch_id)
+        if ch is None:
+            try:
+                ch = await client.fetch_channel(ch_id)
+            except Exception as e:
+                print(f"fetch_channel({ch_id}) falhou: {e}")
+                continue
         if ch and ch.guild.id == guild_id:
             return ch
+    print(f"Nenhum canal encontrado para guild_id={guild_id}")
     return None
 
 
 @client.event
 async def on_member_join(member):
-    channel = get_guild_channel(member.guild.id)
+    print(f"on_member_join: {member.name} em {member.guild.name} ({member.guild.id})")
+    channel = await get_guild_channel(member.guild.id)
     if channel is None:
         return
 
@@ -42,7 +50,8 @@ async def on_member_join(member):
 
 @client.event
 async def on_member_remove(member):
-    channel = get_guild_channel(member.guild.id)
+    print(f"on_member_remove: {member.name} em {member.guild.name} ({member.guild.id})")
+    channel = await get_guild_channel(member.guild.id)
     if channel is None:
         return
 
