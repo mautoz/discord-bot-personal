@@ -1,91 +1,88 @@
 #!/usr/bin/env python3
 
 import os
-import time
 import asyncio
-import schedule
+from datetime import datetime
 import discord
-from discord.ext import commands
 from dotenv import load_dotenv
 from tools.googleytapi import GoogleYTAPI, CHANNELS_ID_YT
 
-
 load_dotenv()
 
-client = discord.Client()
-
-# TOKEN = os.getenv("DISCORD_TOKEN")
 TOKEN = os.getenv("DISCORD_TOKEN_HAL")
 CHANNEL_ID = int(os.getenv("YOUTUBE_CHANNEL"))
 CHANNEL_ID_HAL = int(os.getenv("YOUTUBE_CHANNEL_HAL"))
-MAX_MESSAGE_LENGTH = 1500
+
+intents = discord.Intents.default()
+client = discord.Client(intents=intents)
+
+
+def build_video_embed(video: dict) -> discord.Embed:
+    snippet = video.get("snippet", {})
+    video_id = video.get("id", {}).get("videoId", "")
+    title = snippet.get("title", "Sem título")
+    channel_name = snippet.get("channelTitle", "—")
+    publish_time = snippet.get("publishTime", "")
+    thumbnail = snippet.get("thumbnails", {}).get("high", {}).get("url") \
+             or snippet.get("thumbnails", {}).get("default", {}).get("url")
+
+    try:
+        dt = datetime.fromisoformat(publish_time.replace("Z", "+00:00"))
+        publish_fmt = dt.strftime("%d/%m/%Y %H:%M")
+    except Exception:
+        publish_fmt = publish_time
+
+    embed = discord.Embed(
+        title=title,
+        url=f"https://www.youtube.com/watch?v={video_id}" if video_id else None,
+        color=discord.Color.red(),
+    )
+    embed.add_field(name="📺 Canal", value=channel_name, inline=True)
+    embed.add_field(name="🕐 Publicado", value=publish_fmt, inline=True)
+    if thumbnail:
+        embed.set_image(url=thumbnail)
+    embed.set_footer(text="YouTube")
+    return embed
 
 
 async def last_videos():
-    """
-    Fill
-    """
     channel = client.get_channel(CHANNEL_ID)
     channel_hal = client.get_channel(CHANNEL_ID_HAL)
 
-    await channel.send(
-        f"Verificando atualizações recentes nos canais de YouTube..."
+    header = discord.Embed(
+        title="📺 Atualizações do YouTube — últimas 24h",
+        color=discord.Color.red(),
     )
-    await channel_hal.send(
-        f"Verificando atualizações recentes nos canais de YouTube..."
-    )
+    for ch in (channel, channel_hal):
+        await ch.send(embed=header)
 
+    total = 0
     with GoogleYTAPI() as googleytapi:
-        message = ""
         for yt_channel, yt_id in CHANNELS_ID_YT.items():
             try:
                 videos = googleytapi.search_last_videos(str(yt_id))
-
             except Exception as error:
-                await channel.send(f"Erro na busca por {yt_channel}")
-                await channel_hal.send(f"Erro na busca por {yt_channel}")
-                print(error)
+                print(f"Erro na busca por {yt_channel}: {error}")
+                continue
 
-            else:
-                if videos:
-                    for video in videos:
-                        video_id = str(
-                            video.get("id", None).get("videoId", None)
-                        ).strip()
-                        channel_name = str(
-                            video.get("snippet", None).get(
-                                "channelTitle", None
-                            )
-                        ).strip()
-                        publish_time = str(
-                            video.get("snippet", None).get("publishTime", None)
-                        ).strip()
-                        title = str(
-                            video.get("snippet", None).get("title", None)
-                        ).strip()
+            if videos:
+                for video in videos:
+                    embed = build_video_embed(video)
+                    for ch in (channel, channel_hal):
+                        await ch.send(embed=embed)
+                    total += 1
 
-                        buffer = f"""\u200bCanal: **{channel_name}**\n \
-                        \u200bTítulo: {title}\n \
-                        \u200bData de publicação: {publish_time}\n \
-                        \u200bLink: https://www.youtube.com/watch?v={video_id}\n
-                        """
-
-                        if len(message) + len(buffer) > MAX_MESSAGE_LENGTH:
-                            await channel.send(message)
-                            await channel_hal.send(message)
-                            message = buffer
-                        else:
-                            message += buffer
-
-                else:
-                    message += f"\u200bSem atualizações recentes para o canal: **{yt_channel}**\n"
-
-        await channel.send(message)
-        await channel_hal.send(message)
+    summary = discord.Embed(
+        description=f"✅ {total} vídeo(s) publicado(s) nas últimas 24h." if total else "😴 Nenhum vídeo novo nas últimas 24h.",
+        color=discord.Color.green() if total else discord.Color.greyple(),
+    )
+    for ch in (channel, channel_hal):
+        await ch.send(embed=summary)
 
 
 @client.event
 async def on_ready():
+    print(f"Youtube Loop Bot conectado como {client.user}")
     while True:
         await last_videos()
         await asyncio.sleep(86400)
