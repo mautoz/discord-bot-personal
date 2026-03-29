@@ -18,18 +18,10 @@ CHANNEL_ID_SKYNET = int(os.getenv("SKYNET_GAMES_CHANNEL"))
 CHANNEL_ID_TROPA = int(os.getenv("TROPA_GAMES_CHANNEL"))
 ITAD_API_KEY = os.getenv("ITAD_API_KEY")
 
-URL_SHOPS = "https://api.isthereanydeal.com/service/shops/v1?country=BR"
 URL_DEALS = "https://api.isthereanydeal.com/deals/v2"
 
-
-def get_shop_ids() -> list:
-    try:
-        r = requests.get(URL_SHOPS, timeout=5)
-        if r.status_code == 200:
-            return [shop["id"] for shop in r.json()]
-    except Exception as e:
-        logging.error("Erro ao buscar lojas: %s", e)
-    return []
+# IDs fixos das lojas selecionadas
+SHOP_IDS = [50, 61, 16, 35, 48]  # Nuuvem, Steam, Epic, GOG, Microsoft Store
 
 
 def convert_iso_datetime(iso_date: str) -> str:
@@ -72,15 +64,13 @@ async def get_discount():
     channel = client.get_channel(CHANNEL_ID_SKYNET)
     channel_tropa = client.get_channel(CHANNEL_ID_TROPA)
 
-    shop_ids = get_shop_ids()
     params = {
         "key": ITAD_API_KEY,
         "country": "BR",
-        "sort": "price",
-        "limit": 50,
+        "sort": "-cut",
+        "limit": 20,
+        "shops": ",".join(str(i) for i in SHOP_IDS),
     }
-    if shop_ids:
-        params["shops"] = ",".join(str(i) for i in shop_ids)
 
     try:
         r = requests.get(URL_DEALS, params=params, timeout=10)
