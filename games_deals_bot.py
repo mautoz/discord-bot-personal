@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import requests
 import logging
-from typing import Union
 import os
 from datetime import datetime
 
@@ -19,43 +18,40 @@ CHANNEL_ID_SKYNET = int(os.getenv("SKYNET_GAMES_CHANNEL"))
 CHANNEL_ID_TROPA = int(os.getenv("TROPA_GAMES_CHANNEL"))
 ITAD_API_KEY = os.getenv("ITAD_API_KEY")
 
-URL_STORES_BR2 = "https://api.isthereanydeal.com/v02/web/stores/?region=br2"
-URL_DEALS_BR = "https://api.isthereanydeal.com/v01/deals/list/?key={0}&region=br2&shops={1}&sort=price%3Aasc"
+URL_SHOPS = "https://api.isthereanydeal.com/service/shops/v1?country=BR"
+URL_DEALS = "https://api.isthereanydeal.com/deals/v2"
 
 
-def retrive_url(url: str) -> Union[dict, None]:
-    r = requests.get(url, timeout=5)
-    logging.info("Status code: %s", str(r.status_code))
-    if r.status_code == 200:
-        return r.json()
-    return None
+def get_shop_ids() -> list:
+    try:
+        r = requests.get(URL_SHOPS, timeout=5)
+        if r.status_code == 200:
+            return [shop["id"] for shop in r.json()]
+    except Exception as e:
+        logging.error("Erro ao buscar lojas: %s", e)
+    return []
 
 
-def get_stores() -> Union[list, None]:
-    response = retrive_url(URL_STORES_BR2)
-    if response is None:
-        return None
-    stores = []
-    if response.get("data") is not None:
-        for store in response.get("data"):
-            stores.append(store.get("id"))
-    return stores
-
-
-def convert_unix_datetime(unix_date: int):
-    if unix_date is None:
+def convert_iso_datetime(iso_date: str) -> str:
+    if not iso_date:
         return "—"
-    return datetime.utcfromtimestamp(unix_date).strftime("%d/%m/%Y %H:%M")
+    try:
+        dt = datetime.fromisoformat(iso_date.replace("Z", "+00:00"))
+        return dt.strftime("%d/%m/%Y %H:%M")
+    except Exception:
+        return iso_date
 
 
-def build_deal_embed(game: dict) -> discord.Embed:
-    title = game.get("title", "Desconhecido")
-    shop = game.get("shop", {}).get("name", "—")
-    price_new = game.get("price_new", 0)
-    price_old = game.get("price_old", 0)
-    price_cut = game.get("price_cut", 0)
-    expiry = convert_unix_datetime(game.get("expiry"))
-    buy_url = game.get("urls", {}).get("buy", None)
+def build_deal_embed(item: dict) -> discord.Embed:
+    title = item.get("title", "Desconhecido")
+    deal = item.get("deal", {})
+    shop = deal.get("shop", {}).get("name", "—")
+    price_new = deal.get("price", {}).get("amount", 0)
+    price_old = deal.get("regular", {}).get("amount", 0)
+    price_cut = deal.get("cut", 0)
+    expiry = convert_iso_datetime(deal.get("expiry"))
+    buy_url = deal.get("url")
+    banner = item.get("assets", {}).get("banner145")
 
     embed = discord.Embed(
         title=f"🎮 {title}",
@@ -66,8 +62,8 @@ def build_deal_embed(game: dict) -> discord.Embed:
     embed.add_field(name="💸 Desconto", value=f"{price_cut}% off", inline=True)
     embed.add_field(name="💰 Preço", value=f"~~R$ {price_old:.2f}~~ → **R$ {price_new:.2f}**", inline=False)
     embed.add_field(name="⏳ Expira em", value=expiry, inline=True)
-    if buy_url:
-        embed.add_field(name="🔗 Comprar", value=f"[Clique aqui]({buy_url})", inline=True)
+    if banner:
+        embed.set_thumbnail(url=banner)
     embed.set_footer(text="IsThereAnyDeal.com")
     return embed
 
@@ -75,12 +71,25 @@ def build_deal_embed(game: dict) -> discord.Embed:
 async def get_discount():
     channel = client.get_channel(CHANNEL_ID_SKYNET)
     channel_tropa = client.get_channel(CHANNEL_ID_TROPA)
-    stores = get_stores()
 
-    deals = retrive_url(
-        URL_DEALS_BR.format(os.getenv("ITAD_API_KEY"), "%2C".join(stores))
-    )
-    deals_list = deals.get("data").get("list")
+    shop_ids = get_shop_ids()
+    params = {
+        "key": ITAD_API_KEY,
+        "country": "BR",
+        "sort": "price",
+        "limit": 50,
+    }
+    if shop_ids:
+        params["shops"] = ",".join(str(i) for i in shop_ids)
+
+    try:
+        r = requests.get(URL_DEALS, params=params, timeout=10)
+        data = r.json() if r.status_code == 200 else {}
+    except Exception as e:
+        logging.error("Erro ao buscar deals: %s", e)
+        data = {}
+
+    deals_list = data.get("list", [])
 
     if not deals_list:
         for ch in (channel, channel_tropa):
@@ -99,14 +108,15 @@ async def get_discount():
     for ch in (channel, channel_tropa):
         await ch.send(embed=header)
 
-    for game in deals_list:
-        embed = build_deal_embed(game)
+    for item in deals_list:
+        embed = build_deal_embed(item)
         for ch in (channel, channel_tropa):
             await ch.send(embed=embed)
 
 
 @client.event
 async def on_ready():
+    print(f"Games Deals Bot conectado como {client.user}")
     while True:
         await get_discount()
         await asyncio.sleep(86400)
