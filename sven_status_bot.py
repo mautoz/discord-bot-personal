@@ -306,6 +306,29 @@ async def svenban(ctx, steamid: str = None, duracao: str = None, *, motivo: str 
     await ctx.send(embed=embed)
 
 
+@bot.command(name="svenunban")
+async def svenunban(ctx, steamid: str = None):
+    if ctx.author.id not in ADMIN_IDS:
+        await ctx.send(embed=discord.Embed(description="❌ Sem permissão.", color=discord.Color.red()))
+        return
+
+    if not steamid:
+        await ctx.send(embed=discord.Embed(
+            description="❌ Uso: `$svenunban <steamid>`\nEx: `$svenunban STEAM_0:1:123456`",
+            color=discord.Color.red(),
+        ))
+        return
+
+    subprocess.run(["screen", "-S", SCREEN_NAME, "-X", "stuff", "\r"])
+    subprocess.run(["screen", "-S", SCREEN_NAME, "-X", "stuff", f".admin_unban {steamid}\r"])
+
+    await ctx.send(embed=discord.Embed(
+        title="✅ Unban aplicado",
+        description=f"`{steamid}` foi desbanido.",
+        color=discord.Color.green(),
+    ))
+
+
 @bot.command(name="svenajuda")
 async def svenajuda(ctx):
     embed = discord.Embed(title="🎮 Sven Co-op Bot", color=discord.Color.blurple())
@@ -314,6 +337,7 @@ async def svenajuda(ctx):
     embed.add_field(name="`$svenxp <steamid>`", value="XP, nível e medalhas de um jogador pelo SteamID", inline=False)
     embed.add_field(name="`$sventrocar <mapa>`", value="Troca o mapa — só admin", inline=False)
     embed.add_field(name="`$svenban <steamid> <minutos|permanente> [motivo]`", value="Bane jogador — só admin. Ex: `$svenban STEAM_0:1:123 60 Flood`", inline=False)
+    embed.add_field(name="`$svenunban <steamid>`", value="Remove ban de um jogador — só admin", inline=False)
     await ctx.send(embed=embed)
 
 
