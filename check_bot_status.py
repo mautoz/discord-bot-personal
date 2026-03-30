@@ -97,7 +97,10 @@ async def update_status():
 async def on_ready():
     print(f"Bot monitor conectado como {client.user}")
     while True:
-        await update_status()
+        try:
+            await update_status()
+        except Exception as e:
+            print(f"Erro no update_status: {e}")
         await asyncio.sleep(3600)
 
 
