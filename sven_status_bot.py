@@ -1,8 +1,10 @@
 #!/usr/bin/env python3
 
 import os
+import re
 import math
 import subprocess
+from datetime import datetime
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
@@ -58,6 +60,29 @@ def get_maps():
         return [l.strip() for l in f if l.strip() and not l.startswith("//")]
 
 
+def get_online_players() -> dict:
+    """Parses today's server log and returns {userid: {name, steamid}} of currently connected players."""
+    log_path = os.path.expanduser(
+        f"~/svencoop-server/svencoop/logs/{datetime.now().strftime('%Y-%m-%d')}.log"
+    )
+    connected = {}
+    pattern = re.compile(r'"(.+?)<(\d+)><(STEAM_[^>]+|BOT)><[^>]*>" (connected|entered the game|disconnected)')
+    try:
+        with open(log_path) as f:
+            for line in f:
+                m = pattern.search(line)
+                if not m:
+                    continue
+                name, userid, steamid, event = m.groups()
+                if event in ("connected", "entered the game"):
+                    connected[userid] = {"name": name, "steamid": steamid}
+                elif event == "disconnected":
+                    connected.pop(userid, None)
+    except Exception:
+        pass
+    return connected
+
+
 def changelevel(mapname: str):
     # Limpa qualquer input pendente no buffer antes de enviar
     subprocess.run(["screen", "-S", SCREEN_NAME, "-X", "stuff", "\r"])
@@ -68,7 +93,11 @@ def changelevel(mapname: str):
 async def svenstatus(ctx):
     try:
         info = a2s.info(SERVER_ADDR, timeout=3)
-        players = a2s.players(SERVER_ADDR, timeout=3)
+        a2s_players = a2s.players(SERVER_ADDR, timeout=3)
+
+        # Duration from A2S, SteamID from log
+        log_players = get_online_players()
+        duration_map = {p.name: int(p.duration // 60) for p in a2s_players if p.name}
 
         color = discord.Color.green() if info.player_count > 0 else discord.Color.blue()
         embed = discord.Embed(title="🎮 Mau Sven Co-op Server", color=color)
@@ -76,12 +105,12 @@ async def svenstatus(ctx):
         embed.add_field(name="👥 Jogadores", value=f"{info.player_count}/{info.max_players}", inline=True)
         embed.add_field(name="📡 IP", value=f"{SERVER_PUBLIC_IP}:27015", inline=True)
 
-        online = [p for p in players if p.name]
-        if online:
-            player_list = "\n".join(
-                f"• {p.name} ({int(p.duration // 60)}min)" for p in online
-            )
-            embed.add_field(name="👤 Online agora", value=player_list, inline=False)
+        if log_players:
+            lines = []
+            for p in log_players.values():
+                mins = duration_map.get(p["name"], 0)
+                lines.append(f"• **{p['name']}** `{p['steamid']}` ({mins}min)")
+            embed.add_field(name="👤 Online agora", value="\n".join(lines), inline=False)
 
         await ctx.send(embed=embed)
 
@@ -280,11 +309,11 @@ async def svenban(ctx, steamid: str = None, duracao: str = None, *, motivo: str 
 @bot.command(name="svenajuda")
 async def svenajuda(ctx):
     embed = discord.Embed(title="🎮 Sven Co-op Bot", color=discord.Color.blurple())
-    embed.add_field(name="`$svenstatus`", value="Status do servidor (mapa, jogadores, IP)", inline=False)
+    embed.add_field(name="`$svenstatus`", value="Status do servidor — mapa, jogadores com SteamID e tempo online", inline=False)
     embed.add_field(name="`$svenmapas [busca]`", value="Lista mapas instalados. Ex: `$svenmapas secretcity`", inline=False)
-    embed.add_field(name="`$svenxp <steamid>`", value="XP, nível e medalhas de um jogador", inline=False)
-    embed.add_field(name="`$sventrocar <mapa>`", value="Troca o mapa (só admin)", inline=False)
-    embed.add_field(name="`$svenban <steamid> <minutos|permanente> [motivo]`", value="Bane jogador (só admin)", inline=False)
+    embed.add_field(name="`$svenxp <steamid>`", value="XP, nível e medalhas de um jogador pelo SteamID", inline=False)
+    embed.add_field(name="`$sventrocar <mapa>`", value="Troca o mapa — só admin", inline=False)
+    embed.add_field(name="`$svenban <steamid> <minutos|permanente> [motivo]`", value="Bane jogador — só admin. Ex: `$svenban STEAM_0:1:123 60 Flood`", inline=False)
     await ctx.send(embed=embed)
 
 
