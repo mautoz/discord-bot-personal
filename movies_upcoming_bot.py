@@ -6,8 +6,6 @@ import asyncio
 import requests
 import discord
 from dotenv import load_dotenv
-import time
-import random
 
 load_dotenv()
 
@@ -27,10 +25,12 @@ CHANNEL_ID_TROPA = int(os.getenv("TROPA_UPCOMING_CHANNEL"))
 CHANNEL_ID_SKYNET = int(os.getenv("SKYNET_UPCOMING_CHANNEL"))
 
 
-def request_data(page: int):
+async def request_data(page: int):
+    loop = asyncio.get_event_loop()
     try:
-        time.sleep(random.randint(1, 3))
-        response = requests.get(URL_DEFAULT.format(page), headers=HEADERS, timeout=5)
+        response = await loop.run_in_executor(
+            None, lambda: requests.get(URL_DEFAULT.format(page), headers=HEADERS, timeout=10)
+        )
     except requests.exceptions.RequestException as error:
         print(error)
         return None
@@ -68,7 +68,10 @@ async def last_upcoming_movies():
     channel_tropa = client.get_channel(CHANNEL_ID_TROPA)
     channel_skynet = client.get_channel(CHANNEL_ID_SKYNET)
 
-    response = request_data(1)
+    response = await request_data(1)
+    if not response:
+        print("Erro ao buscar página 1 da TMDB.")
+        return
     data = response.json()
 
     try:
@@ -92,10 +95,10 @@ async def last_upcoming_movies():
 
     if total_pages > 1:
         for page in range(2, total_pages + 1):
-            print("Current page = %s", str(page))
-            response = request_data(page)
-            data = response.json()
-            movies.extend(data.get("results", []))
+            response = await request_data(page)
+            if response:
+                movies.extend(response.json().get("results", []))
+            await asyncio.sleep(1)
 
     # Remove filmes sem data de lançamento definida
     movies = [m for m in movies if m.get("release_date")]
