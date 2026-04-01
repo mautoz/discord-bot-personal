@@ -27,6 +27,7 @@ BOTS = {
     "Games Deals":        "games_deals_bot.py",
     "Movies Upcoming":    "movies_upcoming_bot.py",
     "Entertainment News": "entertainment_news_bot.py",
+    "RSS Feeds":          "rss_bot.py",
 }
 
 THUMBNAIL = "https://i0.wp.com/www.setcenas.com.br/wp-content/uploads/2020/07/Terminator-Orion.jpg"

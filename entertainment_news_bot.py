@@ -120,7 +120,7 @@ async def help_cmd(ctx):
     )
     embed.add_field(
         name="🎥 Outros (automáticos, sem comando)",
-        value="🎬 Lançamentos nos cinemas — postado semanalmente\n🤖 Monitor de bots — atualizado de hora em hora",
+        value="🎬 Lançamentos nos cinemas — postado semanalmente\n🎮📚 RSS Feeds — games e editoras, postado quando sai novidade\n🤖 Monitor de bots — atualizado de hora em hora",
         inline=False,
     )
     await ctx.send(embed=embed)
