@@ -12,8 +12,16 @@ from dotenv import load_dotenv
 load_dotenv()
 
 TOKEN = os.getenv("DISCORD_TOKEN_HAL")
-CHANNEL_GAMES = int(os.getenv("RSS_GAMES_CHANNEL", "0"))
-CHANNEL_BOOKS = int(os.getenv("RSS_BOOKS_CHANNEL", "0"))
+CHANNELS = {
+    "games": [
+        int(os.getenv("RSS_GAMES_CHANNEL_TROPA", "0")),
+        int(os.getenv("RSS_GAMES_CHANNEL_SKYNET", "0")),
+    ],
+    "books": [
+        int(os.getenv("RSS_BOOKS_CHANNEL_TROPA", "0")),
+        int(os.getenv("RSS_BOOKS_CHANNEL_SKYNET", "0")),
+    ],
+}
 SEEN_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "data", "rss_seen.json")
 CHECK_INTERVAL = 3600  # segundos — altere aqui para mudar a frequência
 MAX_NEW_PER_FEED = 5   # máximo de posts por feed por checagem (anti-flood)
@@ -118,10 +126,6 @@ client = discord.Client(intents=intents)
 
 async def check_feeds():
     seen = load_seen()
-    channels = {
-        "games": client.get_channel(CHANNEL_GAMES),
-        "books": client.get_channel(CHANNEL_BOOKS),
-    }
 
     for name, (category, url) in FEEDS.items():
         try:
@@ -144,12 +148,13 @@ async def check_feeds():
             if is_first_run:
                 print(f"[RSS] {name}: primeiro boot, {len(new_items)} itens marcados como vistos.")
             elif new_items:
-                ch = channels.get(category)
-                if ch:
-                    for entry in reversed(new_items[:MAX_NEW_PER_FEED]):
-                        await ch.send(embed=build_embed(entry, name, category))
-                        await asyncio.sleep(1)
-                    print(f"[RSS] {name}: {len(new_items[:MAX_NEW_PER_FEED])} novidade(s) postada(s).")
+                for channel_id in CHANNELS[category]:
+                    ch = client.get_channel(channel_id)
+                    if ch:
+                        for entry in reversed(new_items[:MAX_NEW_PER_FEED]):
+                            await ch.send(embed=build_embed(entry, name, category))
+                            await asyncio.sleep(1)
+                print(f"[RSS] {name}: {len(new_items[:MAX_NEW_PER_FEED])} novidade(s) postada(s).")
 
         except Exception as e:
             print(f"[RSS] Erro em {name}: {e}")
