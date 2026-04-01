@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import os
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 import asyncio
 import requests
 import discord
@@ -25,12 +25,6 @@ HEADERS = {
 TOKEN = os.getenv("DISCORD_TOKEN_HAL")
 CHANNEL_ID_TROPA = int(os.getenv("TROPA_UPCOMING_CHANNEL"))
 CHANNEL_ID_SKYNET = int(os.getenv("SKYNET_UPCOMING_CHANNEL"))
-
-
-def less_than_week(date: str) -> bool:
-    current_date = datetime.now()
-    release_date = datetime.strptime(date, "%Y-%m-%d")
-    return current_date - release_date <= timedelta(days=7)
 
 
 def request_data(page: int):
@@ -94,23 +88,21 @@ async def last_upcoming_movies():
     for ch in (channel_tropa, channel_skynet):
         await ch.send(embed=header)
 
-    movies = []
-    for result in results:
-        if less_than_week(result["release_date"]) and result.get("original_language") in ("en", "pt"):
-            movies.append(result)
+    movies = list(results)
 
     if total_pages > 1:
         for page in range(2, total_pages + 1):
             print("Current page = %s", str(page))
             response = request_data(page)
             data = response.json()
-            for result in data.get("results", []):
-                if less_than_week(result["release_date"]) and result.get("original_language") in ("en", "pt"):
-                    movies.append(result)
+            movies.extend(data.get("results", []))
+
+    # Remove filmes sem data de lançamento definida
+    movies = [m for m in movies if m.get("release_date")]
 
     if not movies:
         no_movies = discord.Embed(
-            description="Sem novidades nos cinemas nos últimos 7 dias.",
+            description="Nenhum lançamento encontrado para este período.",
             color=discord.Color.greyple(),
         )
         for ch in (channel_tropa, channel_skynet):

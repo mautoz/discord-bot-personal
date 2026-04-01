@@ -14,9 +14,8 @@ import requests
 load_dotenv()
 logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 intents = discord.Intents.default()
-intents.messages = True
-client = discord.Client(intents=intents)
-bot = commands.Bot(command_prefix="$", intents=intents)
+intents.message_content = True
+bot = commands.Bot(command_prefix="$", intents=intents, help_command=None)
 
 TOKEN = os.getenv("DISCORD_TOKEN_HAL")
 CHANNEL_ID_SKYNET = int(os.getenv("SKYNET_NEWS_CHANNEL"))
@@ -99,6 +98,32 @@ async def send_news(ctx, country: str, label: str, color: discord.Color):
         if "removed" in str(title).lower():
             continue
         await ctx.send(embed=build_article_embed(article, color))
+
+
+@bot.command(name="help")
+async def help_cmd(ctx):
+    embed = discord.Embed(title="📋 Guia dos Bots", color=discord.Color.blurple())
+    embed.add_field(
+        name="📰 Notícias (aqui, canal #News)",
+        value="`$queronoticias` — Top notícias de entretenimento BR\n`$queronews` — Top notícias de entretenimento US",
+        inline=False,
+    )
+    embed.add_field(
+        name="🎬 Filmes e Séries (qualquer canal)",
+        value="`$movie <título>` — Busca filme\n`$info <título>` — Detalhes de série\n`$cast <título>` — Elenco\n`$title <título>` — Busca IMDB",
+        inline=False,
+    )
+    embed.add_field(
+        name="🎮 Sven Co-op (qualquer canal)",
+        value="`$svenstatus` — Status do servidor\n`$svenmapas [busca]` — Mapas instalados\n`$svenxp <steamid>` — XP e nível\n`$sventrocar <mapa>` — Troca mapa (admin)\n`$svenban` / `$svenunban` — Ban (admin)",
+        inline=False,
+    )
+    embed.add_field(
+        name="🎥 Outros (automáticos, sem comando)",
+        value="🎬 Lançamentos nos cinemas — postado semanalmente\n🤖 Monitor de bots — atualizado de hora em hora",
+        inline=False,
+    )
+    await ctx.send(embed=embed)
 
 
 @bot.command()

@@ -338,6 +338,7 @@ async def svenajuda(ctx):
     embed.add_field(name="`$sventrocar <mapa>`", value="Troca o mapa — só admin", inline=False)
     embed.add_field(name="`$svenban <steamid> <minutos|permanente> [motivo]`", value="Bane jogador — só admin. Ex: `$svenban STEAM_0:1:123 60 Flood`", inline=False)
     embed.add_field(name="`$svenunban <steamid>`", value="Remove ban de um jogador — só admin", inline=False)
+    embed.set_footer(text="Para ver todos os bots do servidor use $help em qualquer canal")
     await ctx.send(embed=embed)
 
 
